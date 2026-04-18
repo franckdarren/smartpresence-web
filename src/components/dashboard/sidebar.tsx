@@ -8,34 +8,29 @@ import {
   CalendarCheck,
   Settings,
   QrCode,
+  Globe,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Employés",
-    href: "/employees",
-    icon: Users,
-  },
-  {
-    label: "Présences",
-    href: "/attendance",
-    icon: CalendarCheck,
-  },
-  {
-    label: "Paramètres",
-    href: "/settings",
-    icon: Settings,
-  },
+type Role = "superadmin" | "admin" | "employee";
+
+const adminNavItems = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Employés", href: "/employees", icon: Users },
+  { label: "Présences", href: "/attendance", icon: CalendarCheck },
+  { label: "Paramètres", href: "/settings", icon: Settings },
 ];
 
-export function Sidebar() {
+const superadminNavItems = [
+  { label: "Vue globale", href: "/superadmin/overview", icon: Globe },
+  { label: "Entreprises", href: "/companies", icon: Building2 },
+  { label: "Utilisateurs", href: "/superadmin/users", icon: Users },
+];
+
+export function Sidebar({ role }: { role: Role }) {
   const pathname = usePathname();
+  const navItems = role === "superadmin" ? superadminNavItems : adminNavItems;
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-border bg-sidebar">
@@ -50,7 +45,7 @@ export function Sidebar() {
 
       <nav className="flex flex-1 flex-col gap-1 p-3">
         <p className="mb-1 px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Navigation
+          {role === "superadmin" ? "Administration" : "Navigation"}
         </p>
         {navItems.map((item) => {
           const Icon = item.icon;
