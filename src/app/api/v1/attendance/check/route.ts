@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = checkAttendanceSchema.safeParse(body);
     if (!parsed.success) {
-      return ApiResponse.error(parsed.error.errors[0].message, 422);
+      return ApiResponse.error(parsed.error.issues[0].message, 422);
     }
 
     const result = await service.execute(parsed.data, user);
