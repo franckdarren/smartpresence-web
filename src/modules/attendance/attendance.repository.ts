@@ -1,7 +1,20 @@
 import { db } from "@/lib/db";
-import { attendances } from "@/lib/db/schema";
+import { attendances, users } from "@/lib/db/schema";
 import type { Attendance, NewAttendance } from "@/lib/db/schema";
 import { eq, and, isNull, gte, lt } from "drizzle-orm";
+
+export type AttendanceRow = {
+  id: string;
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  check_in: Date;
+  check_out: Date | null;
+  latitude: number;
+  longitude: number;
+  wifi_ssid: string | null;
+  created_at: Date | null;
+};
 
 export class AttendanceRepository {
   async findActiveForUser(userId: string): Promise<Attendance | undefined> {
@@ -46,5 +59,40 @@ export class AttendanceRepository {
       .select()
       .from(attendances)
       .where(eq(attendances.user_id, userId));
+  }
+
+  async findByCompanyAndDate(
+    companyId: string,
+    date: Date,
+    employeeId?: string
+  ): Promise<AttendanceRow[]> {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const conditions = [
+      eq(users.company_id, companyId),
+      gte(attendances.check_in, start),
+      lt(attendances.check_in, end),
+      ...(employeeId ? [eq(attendances.user_id, employeeId)] : []),
+    ];
+
+    return db
+      .select({
+        id: attendances.id,
+        user_id: attendances.user_id,
+        user_name: users.name,
+        user_email: users.email,
+        check_in: attendances.check_in,
+        check_out: attendances.check_out,
+        latitude: attendances.latitude,
+        longitude: attendances.longitude,
+        wifi_ssid: attendances.wifi_ssid,
+        created_at: attendances.created_at,
+      })
+      .from(attendances)
+      .innerJoin(users, eq(attendances.user_id, users.id))
+      .where(and(...conditions));
   }
 }
