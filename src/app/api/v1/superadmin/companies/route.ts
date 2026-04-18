@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { ApiResponse } from "@/lib/api/response";
-import { AuthService } from "@/modules/auth/auth.service";
+import { GuardError, requireRole } from "@/lib/api/guards";
 import { CompaniesService } from "@/modules/companies/companies.service";
 import { createCompanySchema } from "@/modules/companies/companies.validator";
 import { db } from "@/lib/db";
@@ -9,17 +9,9 @@ import { eq, sql, and } from "drizzle-orm";
 
 const service = new CompaniesService();
 
-async function requireSuperadmin() {
-  const user = await AuthService.getAuthenticatedUser();
-  if (user.role !== "superadmin") {
-    throw new Error("FORBIDDEN");
-  }
-  return user;
-}
-
 export async function GET() {
   try {
-    await requireSuperadmin();
+    await requireRole(["superadmin"]);
 
     const result = await db
       .select({
@@ -41,16 +33,15 @@ export async function GET() {
 
     return ApiResponse.success(result, "Entreprises récupérées");
   } catch (err) {
+    if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
     const message = err instanceof Error ? err.message : "Erreur interne";
-    if (message === "FORBIDDEN") return ApiResponse.error("Accès refusé", 403);
-    if (message === "Unauthorized") return ApiResponse.error(message, 401);
     return ApiResponse.error(message, 400);
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    await requireSuperadmin();
+    await requireRole(["superadmin"]);
 
     const body = await req.json();
     const parsed = createCompanySchema.safeParse(body);
@@ -61,9 +52,8 @@ export async function POST(req: NextRequest) {
     const company = await service.create(parsed.data);
     return ApiResponse.success(company, "Entreprise créée", 201);
   } catch (err) {
+    if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
     const message = err instanceof Error ? err.message : "Erreur interne";
-    if (message === "FORBIDDEN") return ApiResponse.error("Accès refusé", 403);
-    if (message === "Unauthorized") return ApiResponse.error(message, 401);
     return ApiResponse.error(message, 400);
   }
 }

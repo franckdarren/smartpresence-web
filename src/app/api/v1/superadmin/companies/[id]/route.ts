@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/lib/api/response";
-import { AuthService } from "@/modules/auth/auth.service";
+import { GuardError, requireRole } from "@/lib/api/guards";
 import { db } from "@/lib/db";
 import { companies, users } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -9,10 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const caller = await AuthService.getAuthenticatedUser();
-    if (caller.role !== "superadmin") {
-      return ApiResponse.error("Accès refusé", 403);
-    }
+    await requireRole(["superadmin"]);
 
     const { id } = await params;
 
@@ -34,7 +31,8 @@ export async function GET(
 
     return ApiResponse.success({ company, admins }, "Entreprise récupérée");
   } catch (err) {
+    if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
     const message = err instanceof Error ? err.message : "Erreur interne";
-    return ApiResponse.error(message, message === "Unauthorized" ? 401 : 400);
+    return ApiResponse.error(message, 400);
   }
 }

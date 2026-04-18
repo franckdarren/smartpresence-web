@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { ApiResponse } from "@/lib/api/response";
-import { AuthService } from "@/modules/auth/auth.service";
+import { GuardError, requireRole } from "@/lib/api/guards";
 import { createAdminForCompany } from "@/lib/api/create-admin";
 import { z } from "zod";
 
@@ -17,10 +17,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const caller = await AuthService.getAuthenticatedUser();
-    if (caller.role !== "superadmin") {
-      return ApiResponse.error("Accès réservé aux super administrateurs", 403);
-    }
+    await requireRole(["superadmin"]);
 
     const { id: companyId } = await params;
 
@@ -33,9 +30,9 @@ export async function POST(
     const admin = await createAdminForCompany(companyId, parsed.data);
     return ApiResponse.success(admin, "Admin créé", 201);
   } catch (err) {
+    if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
     const message = err instanceof Error ? err.message : "Erreur interne";
-    if (message === "Entreprise introuvable")
-      return ApiResponse.error(message, 404);
-    return ApiResponse.error(message, message === "Unauthorized" ? 401 : 400);
+    if (message === "Entreprise introuvable") return ApiResponse.error(message, 404);
+    return ApiResponse.error(message, 400);
   }
 }

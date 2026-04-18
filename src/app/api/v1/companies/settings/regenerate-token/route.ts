@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { AuthService } from "@/modules/auth/auth.service";
+import { GuardError, requireRole } from "@/lib/api/guards";
 import { CompaniesService } from "@/modules/companies/companies.service";
 import { ApiResponse } from "@/lib/api/response";
 
@@ -7,12 +7,9 @@ const service = new CompaniesService();
 
 export async function POST() {
   try {
-    const user = await AuthService.getAuthenticatedUser();
+    const user = await requireRole(["admin", "superadmin"]);
     if (!user.company_id) {
       return ApiResponse.error("Aucune entreprise associée", 404);
-    }
-    if (user.role !== "admin" && user.role !== "superadmin") {
-      return ApiResponse.error("Accès refusé", 403);
     }
 
     const company = await service.update(user.company_id, {
@@ -20,7 +17,8 @@ export async function POST() {
     });
     return ApiResponse.success(company, "QR Code régénéré");
   } catch (err) {
+    if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
     const message = err instanceof Error ? err.message : "Erreur interne";
-    return ApiResponse.error(message, message === "Unauthorized" ? 401 : 400);
+    return ApiResponse.error(message, 400);
   }
 }

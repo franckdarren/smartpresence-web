@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { ApiResponse } from "@/lib/api/response";
-import { AuthService } from "@/modules/auth/auth.service";
+import { GuardError, requireRole } from "@/lib/api/guards";
 import { createEmployeeSchema } from "@/modules/employees/employees.validator";
 import { EmployeesService } from "@/modules/employees/employees.service";
 import { createClient } from "@supabase/supabase-js";
@@ -9,10 +9,7 @@ const service = new EmployeesService();
 
 export async function GET() {
   try {
-    const user = await AuthService.getAuthenticatedUser();
-    if (user.role === "employee") {
-      return ApiResponse.error("Forbidden", 403);
-    }
+    const user = await requireRole(["admin", "superadmin"]);
     if (!user.company_id) {
       return ApiResponse.error("User has no company", 400);
     }
@@ -20,18 +17,15 @@ export async function GET() {
     const employees = await service.listByCompany(user.company_id);
     return ApiResponse.success(employees, "Employees retrieved");
   } catch (err) {
+    if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
     const message = err instanceof Error ? err.message : "Failed to retrieve employees";
-    const status = message === "Unauthorized" ? 401 : 400;
-    return ApiResponse.error(message, status);
+    return ApiResponse.error(message, 400);
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await AuthService.getAuthenticatedUser();
-    if (user.role === "employee") {
-      return ApiResponse.error("Forbidden", 403);
-    }
+    const user = await requireRole(["admin", "superadmin"]);
     if (!user.company_id) {
       return ApiResponse.error("User has no company", 400);
     }
@@ -61,8 +55,8 @@ export async function POST(req: NextRequest) {
     const employee = await service.create(parsed.data, user.company_id, authData.user.id);
     return ApiResponse.success(employee, "Employee created", 201);
   } catch (err) {
+    if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
     const message = err instanceof Error ? err.message : "Failed to create employee";
-    const status = message === "Unauthorized" ? 401 : 400;
-    return ApiResponse.error(message, status);
+    return ApiResponse.error(message, 400);
   }
 }
