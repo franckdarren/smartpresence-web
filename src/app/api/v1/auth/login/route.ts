@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) {
-      return ApiResponse.error(parsed.error.errors[0].message, 422);
+      return ApiResponse.error(parsed.error.issues[0].message, 422);
     }
 
     const result = await AuthService.login(parsed.data.email, parsed.data.password);
