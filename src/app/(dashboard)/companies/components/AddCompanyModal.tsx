@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { X, Building2, Loader2 } from "lucide-react";
+import { X, Building2, Loader2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FormState {
@@ -26,8 +26,38 @@ export function AddCompanyModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [loading, setLoading] = useState(false);
+  const [geoLoading, setGeoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
+
+  function handleUseMyLocation() {
+    if (!("geolocation" in navigator)) {
+      setError("La géolocalisation n'est pas supportée par ce navigateur.");
+      return;
+    }
+    setGeoLoading(true);
+    setError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setForm((f) => ({
+          ...f,
+          latitude: pos.coords.latitude.toFixed(6),
+          longitude: pos.coords.longitude.toFixed(6),
+        }));
+        setGeoLoading(false);
+      },
+      (err) => {
+        const messages: Record<number, string> = {
+          1: "Permission refusée. Autorisez l'accès à la position dans votre navigateur.",
+          2: "Position indisponible. Vérifiez votre connexion et réessayez.",
+          3: "Délai dépassé. Réessayez.",
+        };
+        setError(messages[err.code] ?? "Impossible de récupérer la position.");
+        setGeoLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -172,48 +202,68 @@ export function AddCompanyModal() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="co-lat"
-                    className="block text-sm font-medium text-card-foreground"
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-card-foreground">
+                    Coordonnées GPS
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleUseMyLocation}
+                    disabled={loading || geoLoading}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
                   >
-                    Latitude
-                  </label>
-                  <input
-                    id="co-lat"
-                    type="number"
-                    required
-                    step="any"
-                    value={form.latitude}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, latitude: e.target.value }))
-                    }
-                    placeholder="48.8566"
-                    className={field}
-                    disabled={loading}
-                  />
+                    {geoLoading ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <MapPin className="h-3.5 w-3.5" />
+                    )}
+                    {geoLoading ? "Localisation…" : "Utiliser ma position"}
+                  </button>
                 </div>
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="co-lng"
-                    className="block text-sm font-medium text-card-foreground"
-                  >
-                    Longitude
-                  </label>
-                  <input
-                    id="co-lng"
-                    type="number"
-                    required
-                    step="any"
-                    value={form.longitude}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, longitude: e.target.value }))
-                    }
-                    placeholder="2.3522"
-                    className={field}
-                    disabled={loading}
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="co-lat"
+                      className="block text-xs font-medium text-muted-foreground"
+                    >
+                      Latitude
+                    </label>
+                    <input
+                      id="co-lat"
+                      type="number"
+                      required
+                      step="any"
+                      value={form.latitude}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, latitude: e.target.value }))
+                      }
+                      placeholder="48.8566"
+                      className={field}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="co-lng"
+                      className="block text-xs font-medium text-muted-foreground"
+                    >
+                      Longitude
+                    </label>
+                    <input
+                      id="co-lng"
+                      type="number"
+                      required
+                      step="any"
+                      value={form.longitude}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, longitude: e.target.value }))
+                      }
+                      placeholder="2.3522"
+                      className={field}
+                      disabled={loading}
+                    />
+                  </div>
                 </div>
               </div>
 
