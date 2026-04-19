@@ -41,34 +41,46 @@ export class AuthService {
     };
   }
 
-  static async getAuthenticatedUser(): Promise<User> {
-    const cookieStore = await cookies();
+  static async getAuthenticatedUser(bearerToken?: string): Promise<User> {
+    let authUserId: string | null = null;
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-        },
+    if (bearerToken) {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data, error } = await supabase.auth.getUser(bearerToken);
+      if (error || !data.user) {
+        throw new Error("Unauthorized");
       }
-    );
-
-    const {
-      data: { user: authUser },
-      error,
-    } = await supabase.auth.getUser();
-
-    if (error || !authUser) {
-      throw new Error("Unauthorized");
+      authUserId = data.user.id;
+    } else {
+      const cookieStore = await cookies();
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return cookieStore.getAll();
+            },
+          },
+        }
+      );
+      const {
+        data: { user: authUser },
+        error,
+      } = await supabase.auth.getUser();
+      if (error || !authUser) {
+        throw new Error("Unauthorized");
+      }
+      authUserId = authUser.id;
     }
 
     const [dbUser] = await db
       .select()
       .from(users)
-      .where(eq(users.id, authUser.id))
+      .where(eq(users.id, authUserId))
       .limit(1);
 
     if (!dbUser) {
