@@ -12,8 +12,6 @@ interface Props {
 
 interface FormState {
   name: string;
-  latitude: string;
-  longitude: string;
   radius: string;
   wifi_ssid: string;
 }
@@ -24,8 +22,6 @@ export function SettingsForm({ company }: Props) {
 
   const [form, setForm] = useState<FormState>({
     name: company.name,
-    latitude: String(company.latitude),
-    longitude: String(company.longitude),
     radius: String(company.radius),
     wifi_ssid: company.wifi_ssid ?? "",
   });
@@ -52,8 +48,6 @@ export function SettingsForm({ company }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
-          latitude: parseFloat(form.latitude),
-          longitude: parseFloat(form.longitude),
           radius: parseInt(form.radius, 10),
           wifi_ssid: form.wifi_ssid || null,
         }),
@@ -167,50 +161,27 @@ export function SettingsForm({ company }: Props) {
               />
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="s-lat"
-                  className="block text-sm font-medium text-card-foreground"
-                >
-                  Latitude
-                </label>
-                <input
-                  id="s-lat"
-                  type="number"
-                  required
-                  step="any"
-                  value={form.latitude}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, latitude: e.target.value }))
-                  }
-                  placeholder="48.8566"
-                  className={inputClass}
-                  disabled={saving}
-                />
+            <div className="space-y-1.5">
+              <span className="block text-sm font-medium text-card-foreground">
+                Coordonnées GPS
+              </span>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="block text-xs text-muted-foreground">Latitude</label>
+                  <p className={`${inputClass} cursor-default select-text opacity-60`}>
+                    {company.latitude}
+                  </p>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs text-muted-foreground">Longitude</label>
+                  <p className={`${inputClass} cursor-default select-text opacity-60`}>
+                    {company.longitude}
+                  </p>
+                </div>
               </div>
-
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="s-lon"
-                  className="block text-sm font-medium text-card-foreground"
-                >
-                  Longitude
-                </label>
-                <input
-                  id="s-lon"
-                  type="number"
-                  required
-                  step="any"
-                  value={form.longitude}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, longitude: e.target.value }))
-                  }
-                  placeholder="2.3522"
-                  className={inputClass}
-                  disabled={saving}
-                />
-              </div>
+              <p className="text-xs text-muted-foreground">
+                Les coordonnées GPS ne peuvent pas être modifiées après la création.
+              </p>
             </div>
 
             <div className="space-y-1.5">

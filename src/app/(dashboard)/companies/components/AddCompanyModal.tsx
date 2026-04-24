@@ -37,25 +37,38 @@ export function AddCompanyModal() {
     }
     setGeoLoading(true);
     setError(null);
+
+    const applyPosition = (pos: GeolocationPosition) => {
+      setForm((f) => ({
+        ...f,
+        latitude: pos.coords.latitude.toFixed(6),
+        longitude: pos.coords.longitude.toFixed(6),
+      }));
+      setGeoLoading(false);
+    };
+
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setForm((f) => ({
-          ...f,
-          latitude: pos.coords.latitude.toFixed(6),
-          longitude: pos.coords.longitude.toFixed(6),
-        }));
-        setGeoLoading(false);
-      },
+      applyPosition,
       (err) => {
-        const messages: Record<number, string> = {
-          1: "Permission refusée. Autorisez l'accès à la position dans votre navigateur.",
-          2: "Position indisponible. Vérifiez votre connexion et réessayez.",
-          3: "Délai dépassé. Réessayez.",
-        };
-        setError(messages[err.code] ?? "Impossible de récupérer la position.");
-        setGeoLoading(false);
+        if (err.code === 3) {
+          navigator.geolocation.getCurrentPosition(
+            applyPosition,
+            () => {
+              setError("Impossible de récupérer la position. Vérifiez les permissions du navigateur.");
+              setGeoLoading(false);
+            },
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+          );
+        } else {
+          const messages: Record<number, string> = {
+            1: "Permission refusée. Autorisez l'accès à la position dans votre navigateur.",
+            2: "Position indisponible. Vérifiez votre connexion et réessayez.",
+          };
+          setError(messages[err.code] ?? "Impossible de récupérer la position.");
+          setGeoLoading(false);
+        }
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
     );
   }
 

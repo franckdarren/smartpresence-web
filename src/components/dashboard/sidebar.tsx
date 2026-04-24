@@ -36,7 +36,7 @@ export function Sidebar({ role }: { role: Role }) {
     <aside className="flex h-full w-64 flex-col border-r border-border bg-sidebar">
       <div className="flex h-16 items-center gap-2.5 border-b border-border px-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <QrCode className="h-4 w-4 text-primary-foreground" />
+          <QrCode className="h-5 w-5 text-primary-foreground" />
         </div>
         <span className="text-base font-semibold text-sidebar-foreground">
           SmartPresence

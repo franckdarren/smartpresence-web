@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AttendanceRepository } from "@/modules/attendance/attendance.repository";
 import { EmployeesRepository } from "@/modules/employees/employees.repository";
@@ -49,7 +50,9 @@ export default async function AttendancePage({
         </p>
       </div>
 
-      <AttendanceFilters employees={employees} />
+      <Suspense fallback={<div className="h-16 rounded-xl border border-border bg-card animate-pulse" />}>
+        <AttendanceFilters employees={employees} />
+      </Suspense>
       <AttendanceTable records={records} />
     </div>
   );
