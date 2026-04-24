@@ -1,13 +1,14 @@
 import { randomUUID } from "crypto";
+import { type NextRequest } from "next/server";
 import { GuardError, requireRole } from "@/lib/api/guards";
 import { CompaniesService } from "@/modules/companies/companies.service";
 import { ApiResponse } from "@/lib/api/response";
 
 const service = new CompaniesService();
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
-    const user = await requireRole(["admin", "superadmin"]);
+    const user = await requireRole(["admin", "superadmin"], req);
     if (!user.company_id) {
       return ApiResponse.error("Aucune entreprise associée", 404);
     }

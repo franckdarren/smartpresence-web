@@ -1,3 +1,4 @@
+import { type NextRequest } from "next/server";
 import { ApiResponse } from "@/lib/api/response";
 import { GuardError, requireRole } from "@/lib/api/guards";
 import { db } from "@/lib/db";
@@ -5,11 +6,11 @@ import { companies, users } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 
 export async function GET(
-  _req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole(["superadmin"]);
+    await requireRole(["superadmin"], req);
 
     const { id } = await params;
 

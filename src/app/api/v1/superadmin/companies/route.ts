@@ -9,9 +9,9 @@ import { eq, sql, and } from "drizzle-orm";
 
 const service = new CompaniesService();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    await requireRole(["superadmin"]);
+    await requireRole(["superadmin"], req);
 
     const result = await db
       .select({
@@ -41,7 +41,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(["superadmin"]);
+    await requireRole(["superadmin"], req);
 
     const body = await req.json();
     const parsed = createCompanySchema.safeParse(body);

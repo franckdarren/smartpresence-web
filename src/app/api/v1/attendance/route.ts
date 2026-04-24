@@ -1,12 +1,13 @@
+import { type NextRequest } from "next/server";
 import { ApiResponse } from "@/lib/api/response";
 import { GuardError, requireRole } from "@/lib/api/guards";
 import { AttendanceRepository } from "@/modules/attendance/attendance.repository";
 
 const repo = new AttendanceRepository();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const user = await requireRole(["admin", "employee", "superadmin"]);
+    const user = await requireRole(["admin", "employee", "superadmin"], req);
     const records = await repo.findByUserId(user.id);
     return ApiResponse.success(records, "Attendance records retrieved");
   } catch (err) {

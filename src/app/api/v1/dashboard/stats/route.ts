@@ -1,12 +1,15 @@
+import { type NextRequest } from "next/server";
 import { ApiResponse } from "@/lib/api/response";
 import { AuthService } from "@/modules/auth/auth.service";
 import { DashboardService } from "@/modules/dashboard/dashboard.service";
 
 const service = new DashboardService();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const user = await AuthService.getAuthenticatedUser();
+    const authHeader = req.headers.get("authorization");
+    const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : undefined;
+    const user = await AuthService.getAuthenticatedUser(bearerToken);
 
     if (user.role === "employee") {
       return ApiResponse.error("Accès refusé", 403);

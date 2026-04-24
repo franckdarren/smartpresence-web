@@ -7,9 +7,9 @@ import { createClient } from "@supabase/supabase-js";
 
 const service = new EmployeesService();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const user = await requireRole(["admin", "superadmin"]);
+    const user = await requireRole(["admin", "superadmin"], req);
     if (!user.company_id) {
       return ApiResponse.error("User has no company", 400);
     }
@@ -25,7 +25,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await requireRole(["admin", "superadmin"]);
+    const user = await requireRole(["admin", "superadmin"], req);
     if (!user.company_id) {
       return ApiResponse.error("User has no company", 400);
     }

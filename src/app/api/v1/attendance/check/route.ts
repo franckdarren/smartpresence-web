@@ -8,7 +8,7 @@ const service = new CheckAttendanceService();
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await requireRole(["admin", "employee", "superadmin"]);
+    const user = await requireRole(["admin", "employee", "superadmin"], req);
 
     const body = await req.json();
     const parsed = checkAttendanceSchema.safeParse(body);

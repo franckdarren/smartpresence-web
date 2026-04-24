@@ -17,7 +17,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole(["superadmin"]);
+    await requireRole(["superadmin"], req);
 
     const { id: companyId } = await params;
 

@@ -6,9 +6,9 @@ import { updateCompanySettingsSchema } from "@/modules/companies/companies.valid
 
 const service = new CompaniesService();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const user = await requireRole(["admin", "superadmin"]);
+    const user = await requireRole(["admin", "superadmin"], req);
     if (!user.company_id) {
       return ApiResponse.error("Aucune entreprise associée", 404);
     }
@@ -23,7 +23,7 @@ export async function GET() {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const user = await requireRole(["admin", "superadmin"]);
+    const user = await requireRole(["admin", "superadmin"], req);
     if (!user.company_id) {
       return ApiResponse.error("Aucune entreprise associée", 404);
     }
