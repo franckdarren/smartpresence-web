@@ -29,10 +29,28 @@ export async function middleware(request: NextRequest) {
   );
 
   const {
-    data: { user },
+    data: { user: cookieUser },
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+  const isApiRoute = pathname.startsWith("/api/v1");
+
+  // For API routes, also accept Bearer tokens (mobile clients).
+  let user = cookieUser;
+  if (!user && isApiRoute) {
+    const authHeader = request.headers.get("authorization");
+    const bearer = authHeader?.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : null;
+    if (bearer) {
+      const bearerClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data } = await bearerClient.auth.getUser(bearer);
+      user = data.user ?? null;
+    }
+  }
 
   const isProtectedDashboard =
     pathname.startsWith("/dashboard") ||

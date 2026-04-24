@@ -20,7 +20,8 @@ function extractBearer(req: NextRequest): string | undefined {
 export async function requireAuth(req: NextRequest): Promise<User> {
   try {
     return await AuthService.getAuthenticatedUser(extractBearer(req));
-  } catch {
+  } catch (err) {
+    console.error("[requireAuth] authentication failed:", err);
     throw new GuardError(401, "Non authentifié");
   }
 }
