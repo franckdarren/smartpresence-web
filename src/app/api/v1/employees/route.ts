@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
 import { ApiResponse } from "@/lib/api/response";
-import { GuardError, requireRole } from "@/lib/api/guards";
+import {
+  GuardError,
+  requireRole,
+  requireActiveSubscription,
+  requireEmployeeSlot,
+} from "@/lib/api/guards";
 import { createEmployeeSchema } from "@/modules/employees/employees.validator";
 import { EmployeesService } from "@/modules/employees/employees.service";
 import { createClient } from "@supabase/supabase-js";
@@ -13,6 +18,7 @@ export async function GET(req: NextRequest) {
     if (!user.company_id) {
       return ApiResponse.error("User has no company", 400);
     }
+    await requireActiveSubscription(user.company_id);
 
     const employees = await service.listByCompany(user.company_id);
     return ApiResponse.success(employees, "Employees retrieved");
@@ -29,6 +35,8 @@ export async function POST(req: NextRequest) {
     if (!user.company_id) {
       return ApiResponse.error("User has no company", 400);
     }
+    await requireActiveSubscription(user.company_id);
+    await requireEmployeeSlot(user.company_id);
 
     const body = await req.json();
     const parsed = createEmployeeSchema.safeParse(body);

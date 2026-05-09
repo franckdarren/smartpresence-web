@@ -10,6 +10,7 @@ import {
   QrCode,
   Globe,
   Building2,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ const superadminNavItems = [
   { label: "Vue globale", href: "/superadmin/overview", icon: Globe },
   { label: "Entreprises", href: "/companies", icon: Building2 },
   { label: "Utilisateurs", href: "/superadmin/users", icon: Users },
+  { label: "Abonnements", href: "/subscriptions", icon: CreditCard },
 ];
 
 export function Sidebar({ role }: { role: Role }) {

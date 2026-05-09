@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import type { User, NewUser } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 
 export class EmployeesRepository {
   async findById(id: string): Promise<User | undefined> {
@@ -45,5 +45,13 @@ export class EmployeesRepository {
 
   async delete(id: string): Promise<void> {
     await db.delete(users).where(eq(users.id, id));
+  }
+
+  async countByCompanyId(companyId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(users)
+      .where(eq(users.company_id, companyId));
+    return result?.count ?? 0;
   }
 }

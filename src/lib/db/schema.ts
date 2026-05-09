@@ -40,9 +40,49 @@ export const attendances = pgTable("attendances", {
   created_at: timestamp("created_at").defaultNow(),
 });
 
+// ─── PLANS ───────────────────────────────────────────────────
+export const plans = pgTable("plans", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name", { enum: ["starter", "business", "enterprise"] })
+    .notNull()
+    .unique(),
+  price_monthly: integer("price_monthly").notNull(),
+  max_employees: integer("max_employees"),   // null = illimité
+  max_sites: integer("max_sites"),           // null = illimité
+  extra_employee_price: integer("extra_employee_price").notNull().default(2000),
+  created_at: timestamp("created_at").defaultNow(),
+});
+
+// ─── SUBSCRIPTIONS ───────────────────────────────────────────
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  company_id: uuid("company_id")
+    .notNull()
+    .unique()
+    .references(() => companies.id),
+  plan_id: uuid("plan_id").notNull().references(() => plans.id),
+  status: text("status", {
+    enum: ["trial", "active", "expired", "cancelled"],
+  }).notNull(),
+  billing_cycle: text("billing_cycle", {
+    enum: ["monthly", "yearly"],
+  }).notNull(),
+  current_period_start: timestamp("current_period_start").notNull(),
+  current_period_end: timestamp("current_period_end").notNull(),
+  trial_ends_at: timestamp("trial_ends_at"),
+  extra_employees: integer("extra_employees").notNull().default(0),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+// Types inférés
 export type Company = typeof companies.$inferSelect;
 export type NewCompany = typeof companies.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Attendance = typeof attendances.$inferSelect;
 export type NewAttendance = typeof attendances.$inferInsert;
+export type Plan = typeof plans.$inferSelect;
+export type NewPlan = typeof plans.$inferInsert;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type NewSubscription = typeof subscriptions.$inferInsert;

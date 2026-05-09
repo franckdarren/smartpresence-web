@@ -1,8 +1,11 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { CompaniesService } from "@/modules/companies/companies.service";
+import { SubscriptionService } from "@/modules/subscriptions/subscription.service";
 import { SettingsForm } from "./components/SettingsForm";
+import { SubscriptionSection } from "./components/SubscriptionSection";
 
-const service = new CompaniesService();
+const companyService = new CompaniesService();
+const subscriptionService = new SubscriptionService();
 
 export default async function SettingsPage() {
   const supabase = await createSupabaseServerClient();
@@ -16,9 +19,17 @@ export default async function SettingsPage() {
     .eq("id", user!.id)
     .single();
 
-  const company = profile?.company_id
-    ? await service.getById(profile.company_id).catch(() => null)
-    : null;
+  const companyId = profile?.company_id ?? null;
+
+  const [company, subscriptionData, allPlans] = await Promise.all([
+    companyId
+      ? companyService.getById(companyId).catch(() => null)
+      : Promise.resolve(null),
+    companyId
+      ? subscriptionService.getSubscriptionWithStats(companyId).catch(() => null)
+      : Promise.resolve(null),
+    subscriptionService.getAllPlans().catch(() => []),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -40,6 +51,13 @@ export default async function SettingsPage() {
           </p>
         </div>
       )}
+
+      <SubscriptionSection
+        subscription={subscriptionData?.subscription ?? null}
+        plan={subscriptionData?.plan ?? null}
+        stats={subscriptionData?.stats ?? null}
+        allPlans={allPlans}
+      />
     </div>
   );
 }

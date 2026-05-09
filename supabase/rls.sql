@@ -162,3 +162,64 @@ CREATE POLICY "attendances_insert_employee"
   );
 
 -- employee : pas de UPDATE ni DELETE (aucune policy pour ces opérations)
+
+-- ============================================================
+-- TABLE: plans
+-- ============================================================
+
+ALTER TABLE public.plans ENABLE ROW LEVEL SECURITY;
+
+-- Tous les utilisateurs authentifiés peuvent lire les plans (liste tarifaire)
+CREATE POLICY "plans_select_authenticated"
+  ON public.plans
+  FOR SELECT
+  USING (auth.uid() IS NOT NULL);
+
+-- Seul le superadmin peut modifier les plans
+CREATE POLICY "plans_insert_superadmin"
+  ON public.plans
+  FOR INSERT
+  WITH CHECK (auth_user_role() = 'superadmin');
+
+CREATE POLICY "plans_update_superadmin"
+  ON public.plans
+  FOR UPDATE
+  USING (auth_user_role() = 'superadmin');
+
+CREATE POLICY "plans_delete_superadmin"
+  ON public.plans
+  FOR DELETE
+  USING (auth_user_role() = 'superadmin');
+
+-- ============================================================
+-- TABLE: subscriptions
+-- ============================================================
+
+ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+
+-- superadmin : lecture et écriture totale
+CREATE POLICY "subscriptions_select_superadmin"
+  ON public.subscriptions
+  FOR SELECT
+  USING (auth_user_role() = 'superadmin');
+
+CREATE POLICY "subscriptions_insert_superadmin"
+  ON public.subscriptions
+  FOR INSERT
+  WITH CHECK (auth_user_role() = 'superadmin');
+
+CREATE POLICY "subscriptions_update_superadmin"
+  ON public.subscriptions
+  FOR UPDATE
+  USING (auth_user_role() = 'superadmin');
+
+-- admin : lecture de l'abonnement de son entreprise uniquement
+CREATE POLICY "subscriptions_select_admin"
+  ON public.subscriptions
+  FOR SELECT
+  USING (
+    auth_user_role() = 'admin'
+    AND company_id = auth_user_company_id()
+  );
+
+-- employee : aucun accès aux abonnements

@@ -1,6 +1,11 @@
 import { randomUUID } from "crypto";
 import { type NextRequest } from "next/server";
-import { GuardError, requireRole } from "@/lib/api/guards";
+import {
+  GuardError,
+  requireRole,
+  requireActiveSubscription,
+  requireSiteSlot,
+} from "@/lib/api/guards";
 import { CompaniesService } from "@/modules/companies/companies.service";
 import { ApiResponse } from "@/lib/api/response";
 
@@ -12,6 +17,8 @@ export async function POST(req: NextRequest) {
     if (!user.company_id) {
       return ApiResponse.error("Aucune entreprise associée", 404);
     }
+    await requireActiveSubscription(user.company_id);
+    await requireSiteSlot(user.company_id);
 
     const company = await service.update(user.company_id, {
       company_token: randomUUID(),
