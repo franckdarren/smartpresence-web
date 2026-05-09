@@ -30,7 +30,7 @@ export class SubscriptionRepository {
     return plan;
   }
 
-  async findPlanByName(name: string): Promise<Plan | undefined> {
+  async findPlanByName(name: "starter" | "business" | "enterprise"): Promise<Plan | undefined> {
     const [plan] = await db
       .select()
       .from(plans)
