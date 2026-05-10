@@ -75,6 +75,16 @@ export const subscriptions = pgTable("subscriptions", {
   updated_at: timestamp("updated_at").defaultNow(),
 });
 
+// ─── NOTIFICATION LOGS ───────────────────────────────────────
+export const notificationLogs = pgTable("notification_logs", {
+  id:         uuid("id").primaryKey().defaultRandom(),
+  company_id: uuid("company_id").notNull().references(() => companies.id),
+  type:       text("type").notNull(),
+  email_to:   text("email_to").notNull(),
+  period_ref: timestamp("period_ref").notNull(),
+  sent_at:    timestamp("sent_at").defaultNow(),
+});
+
 // Types inférés
 export type Company = typeof companies.$inferSelect;
 export type NewCompany = typeof companies.$inferInsert;
@@ -86,3 +96,5 @@ export type Plan = typeof plans.$inferSelect;
 export type NewPlan = typeof plans.$inferInsert;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type NewSubscription = typeof subscriptions.$inferInsert;
+export type NotificationLog = typeof notificationLogs.$inferSelect;
+export type NewNotificationLog = typeof notificationLogs.$inferInsert;
