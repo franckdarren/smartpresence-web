@@ -21,6 +21,7 @@ const adminNavItems = [
   { label: "Employés", href: "/employees", icon: Users },
   { label: "Présences", href: "/attendance", icon: CalendarCheck },
   { label: "Paramètres", href: "/settings", icon: Settings },
+  { label: "Mon abonnement", href: "/my-subscription", icon: CreditCard },
 ];
 
 const superadminNavItems = [

@@ -85,6 +85,24 @@ export const notificationLogs = pgTable("notification_logs", {
   sent_at:    timestamp("sent_at").defaultNow(),
 });
 
+// ─── PAYMENT REQUESTS ────────────────────────────────────────
+export const paymentRequests = pgTable("payment_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  company_id: uuid("company_id").notNull().references(() => companies.id),
+  subscription_id: uuid("subscription_id").references(() => subscriptions.id),
+  plan_id: uuid("plan_id").notNull().references(() => plans.id),
+  billing_cycle: text("billing_cycle", { enum: ["monthly", "yearly"] }).notNull(),
+  amount: integer("amount").notNull(),
+  proof_storage_path: text("proof_storage_path").notNull(),
+  status: text("status", { enum: ["pending", "approved", "rejected"] })
+    .notNull()
+    .default("pending"),
+  notes: text("notes"),
+  reviewed_by: uuid("reviewed_by").references(() => users.id),
+  reviewed_at: timestamp("reviewed_at"),
+  created_at: timestamp("created_at").defaultNow(),
+});
+
 // Types inférés
 export type Company = typeof companies.$inferSelect;
 export type NewCompany = typeof companies.$inferInsert;
@@ -98,3 +116,5 @@ export type Subscription = typeof subscriptions.$inferSelect;
 export type NewSubscription = typeof subscriptions.$inferInsert;
 export type NotificationLog = typeof notificationLogs.$inferSelect;
 export type NewNotificationLog = typeof notificationLogs.$inferInsert;
+export type PaymentRequest = typeof paymentRequests.$inferSelect;
+export type NewPaymentRequest = typeof paymentRequests.$inferInsert;

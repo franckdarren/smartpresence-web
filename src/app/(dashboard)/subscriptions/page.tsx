@@ -1,6 +1,7 @@
 import { Building2, CheckCircle, Clock, XCircle, TrendingUp } from "lucide-react";
 import { SubscriptionService } from "@/modules/subscriptions/subscription.service";
 import { SubscriptionsTable } from "./components/SubscriptionsTable";
+import { PaymentRequestsSection } from "./components/PaymentRequestsSection";
 
 const service = new SubscriptionService();
 
@@ -109,7 +110,7 @@ export default async function SubscriptionsPage() {
         })}
       </div>
 
-      {/* Table */}
+      {/* Table abonnements */}
       {subscriptions.length === 0 ? (
         <div className="rounded-xl border border-border bg-card px-6 py-16 text-center shadow-sm">
           <p className="text-sm text-muted-foreground">
@@ -119,6 +120,9 @@ export default async function SubscriptionsPage() {
       ) : (
         <SubscriptionsTable subscriptions={subscriptions} plans={plans} />
       )}
+
+      {/* Demandes de paiement manuel */}
+      <PaymentRequestsSection />
     </div>
   );
 }

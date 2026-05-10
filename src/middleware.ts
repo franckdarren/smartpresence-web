@@ -8,6 +8,7 @@ const SUBSCRIPTION_EXPIRED_PATH = "/dashboard/subscription-expired";
 // Routes dashboard où l'admin expiré est autorisé à accéder
 const SUBSCRIPTION_EXEMPT_PATHS = [
   "/settings",
+  "/my-subscription",
   SUBSCRIPTION_EXPIRED_PATH,
 ];
 
@@ -66,7 +67,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/settings") ||
     pathname.startsWith("/superadmin") ||
     pathname.startsWith("/companies") ||
-    pathname.startsWith("/subscriptions");
+    pathname.startsWith("/subscriptions") ||
+    pathname.startsWith("/my-subscription");
 
   const isProtectedApi =
     pathname.startsWith("/api/v1") && !pathname.startsWith("/api/v1/auth");
@@ -159,6 +161,8 @@ export const config = {
     "/superadmin/:path*",
     "/companies/:path*",
     "/subscriptions/:path*",
+    "/my-subscription/:path*",
+    "/my-subscription",
     "/api/v1/:path*",
   ],
 };

@@ -243,7 +243,7 @@ function Nav() {
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         
         <a href="/login" style={{ fontSize: 14, fontWeight: 500, color: T.ink, textDecoration: "none" }}>Connexion</a>
-        <a href="/login" style={{ fontSize: 14, fontWeight: 600, color: "#fff", background: T.navy, padding: "10px 16px", borderRadius: 8, textDecoration: "none" }}>Essai gratuit</a>
+        <a href="/register" style={{ fontSize: 14, fontWeight: 600, color: "#fff", background: T.navy, padding: "10px 16px", borderRadius: 8, textDecoration: "none" }}>Essai gratuit</a>
       </div>
     </header>
   );
@@ -266,7 +266,7 @@ function Hero() {
             SmartPresence remplace les feuilles de présence et les badgeuses par un pointage QR Code + GPS + Wi-Fi. Conçu pour les entreprises africaines, des PME aux grands groupes.
           </p>
           <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
-            <a href="/login" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 22px", background: T.navy, color: "#fff", borderRadius: 10, fontWeight: 600, fontSize: 15, textDecoration: "none" }}>
+            <a href="/register" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 22px", background: T.navy, color: "#fff", borderRadius: 10, fontWeight: 600, fontSize: 15, textDecoration: "none" }}>
               Démarrer 1 mois gratuit
               <Icon name="arrow" size={16} stroke="#fff" strokeWidth={2} />
             </a>
@@ -424,7 +424,7 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <a href="/login" style={{ display: "block", textAlign: "center", padding: "12px 16px", borderRadius: 10, fontWeight: 600, fontSize: 14, textDecoration: "none", background: p.popular ? T.accent : T.bg, color: p.popular ? "#001b10" : T.ink, border: p.popular ? "none" : `1px solid ${T.line}` }}>
+              <a href="/register" style={{ display: "block", textAlign: "center", padding: "12px 16px", borderRadius: 10, fontWeight: 600, fontSize: 14, textDecoration: "none", background: p.popular ? T.accent : T.bg, color: p.popular ? "#001b10" : T.ink, border: p.popular ? "none" : `1px solid ${T.line}` }}>
                 {p.cta}
               </a>
             </div>
@@ -478,7 +478,7 @@ function CTA() {
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <a href="/login" style={{ padding: "16px 24px", background: T.accent, color: "#001b10", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Démarrer gratuitement</a>
+            <a href="/register" style={{ padding: "16px 24px", background: T.accent, color: "#001b10", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Démarrer gratuitement</a>
             <a href="#features" style={{ padding: "16px 24px", background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,.2)", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Planifier une démo</a>
           </div>
         </div>
