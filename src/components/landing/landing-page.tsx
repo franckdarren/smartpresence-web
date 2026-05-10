@@ -90,8 +90,8 @@ function Icon({ name, size = 20, stroke = "currentColor", strokeWidth = 1.5 }: {
 // ── Logo mark ──────────────────────────────────────────────────────────────
 function LogoMark({ size = 28 }: { size?: number }) {
   const r = Math.round(size * 0.28);
-  const sq = Math.round(size * 0.29);
-  const off = Math.round(size * 0.21);
+  const sq = Math.round(size * 10 / 32);
+  const off = Math.round(size * 5 / 32);
   return (
     <div style={{ width: size, height: size, borderRadius: r, background: T.navy, position: "relative", flexShrink: 0 }}>
       <div style={{ position: "absolute", top: off, left: off, width: sq, height: sq, background: T.accent, borderRadius: 2 }} />

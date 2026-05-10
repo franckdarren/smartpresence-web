@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { QrCode } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { BrandLogo } from "@/components/brand-logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,16 +36,16 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary mb-4">
-            <QrCode className="w-6 h-6 text-primary-foreground" />
+        <div className="flex flex-col items-center mb-8 gap-3">
+          <BrandLogo size={48} showName={false} />
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">
+              SmartPresence
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Connectez-vous à votre espace
+            </p>
           </div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">
-            SmartPresence
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Connectez-vous à votre espace
-          </p>
         </div>
 
         {/* Card */}

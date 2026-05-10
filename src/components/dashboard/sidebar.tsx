@@ -7,12 +7,12 @@ import {
   Users,
   CalendarCheck,
   Settings,
-  QrCode,
   Globe,
   Building2,
   CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BrandLogo } from "@/components/brand-logo";
 
 type Role = "superadmin" | "admin" | "employee";
 
@@ -36,13 +36,8 @@ export function Sidebar({ role }: { role: Role }) {
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-border bg-sidebar">
-      <div className="flex h-16 items-center gap-2.5 border-b border-border px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <QrCode className="h-5 w-5 text-primary-foreground" />
-        </div>
-        <span className="text-base font-semibold text-sidebar-foreground">
-          SmartPresence
-        </span>
+      <div className="flex h-16 items-center border-b border-border px-6 text-sidebar-foreground">
+        <BrandLogo size={28} showName nameFontSize={15} />
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 p-3">
