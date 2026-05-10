@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChevronLeft, ChevronRight, Users, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { User } from "@/lib/db/schema";
 
@@ -45,12 +46,30 @@ interface EmployeeTableProps {
 }
 
 export function EmployeeTable({ employees }: EmployeeTableProps) {
+  const router = useRouter();
   const [page, setPage] = useState(1);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(employees.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const start = (safePage - 1) * PAGE_SIZE;
   const paginated = employees.slice(start, start + PAGE_SIZE);
+
+  async function handleDelete(id: string) {
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/v1/employees/${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? "Erreur interne");
+      setConfirmId(null);
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Erreur lors de la suppression");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <div className="rounded-xl border border-border bg-card shadow-sm">
@@ -82,6 +101,9 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
                   <th className="px-6 py-3.5 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Date d&apos;ajout
                   </th>
+                  <th className="px-6 py-3.5 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -106,6 +128,35 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
                       {formatDate(emp.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      {confirmId === emp.id ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-xs text-muted-foreground">Confirmer ?</span>
+                          <button
+                            onClick={() => handleDelete(emp.id)}
+                            disabled={deletingId === emp.id}
+                            className="rounded-md bg-red-500 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-red-600 disabled:opacity-50"
+                          >
+                            {deletingId === emp.id ? "..." : "Oui"}
+                          </button>
+                          <button
+                            onClick={() => setConfirmId(null)}
+                            disabled={deletingId === emp.id}
+                            className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                          >
+                            Non
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmId(emp.id)}
+                          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500"
+                          aria-label={`Supprimer ${emp.name}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

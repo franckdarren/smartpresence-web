@@ -6,6 +6,7 @@ import { SubscriptionService } from "@/modules/subscriptions/subscription.servic
 import { AttendanceTable } from "./components/AttendanceTable";
 import { AttendanceFilters } from "./components/AttendanceFilters";
 import { ExportButton } from "./components/ExportButton";
+import { ReportButton } from "./components/ReportButton";
 
 const attendanceRepo = new AttendanceRepository();
 const employeesRepo = new EmployeesRepository();
@@ -39,6 +40,7 @@ export default async function AttendancePage({
     : [[], [], null];
 
   const exportEnabled = subData?.plan.excel_export_enabled ?? false;
+  const reportsEnabled = subData?.plan.advanced_reports_enabled ?? false;
   const historyMonths = subData?.plan.history_months ?? null;
 
   return (
@@ -58,11 +60,17 @@ export default async function AttendancePage({
           </p>
         </div>
 
-        <ExportButton
-          enabled={exportEnabled}
-          date={dateParam ?? new Date().toISOString().slice(0, 10)}
-          employeeId={employeeId}
-        />
+        <div className="flex items-center gap-2">
+          <ExportButton
+            enabled={exportEnabled}
+            date={dateParam ?? new Date().toISOString().slice(0, 10)}
+            employeeId={employeeId}
+          />
+          <ReportButton
+            enabled={reportsEnabled}
+            employees={employees.map((e) => ({ id: e.id, name: e.name }))}
+          />
+        </div>
       </div>
 
       <Suspense fallback={<div className="h-16 rounded-xl border border-border bg-card animate-pulse" />}>

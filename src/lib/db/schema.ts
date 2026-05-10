@@ -44,6 +44,7 @@ export const users = pgTable("users", {
     .notNull()
     .default("employee"),
   created_at: timestamp("created_at").defaultNow(),
+  deleted_at: timestamp("deleted_at"),
 });
 
 export const attendances = pgTable("attendances", {

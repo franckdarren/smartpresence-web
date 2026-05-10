@@ -36,6 +36,6 @@ export class EmployeesService {
 
   async delete(id: string, companyId: string): Promise<void> {
     await this.getByIdInCompany(id, companyId);
-    return repo.delete(id);
+    return repo.softDelete(id);
   }
 }
