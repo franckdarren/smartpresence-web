@@ -85,11 +85,11 @@ export class EmailService {
     });
 
     if (error) {
-      throw new Error(`Resend error: ${error.message}`);
+      throw new Error(`Erreur d'envoi d'email : ${error.message}`);
     }
 
     if (!data) {
-      throw new Error("Resend returned no data");
+      throw new Error("L'envoi d'email n'a retourné aucune donnée");
     }
   }
 }

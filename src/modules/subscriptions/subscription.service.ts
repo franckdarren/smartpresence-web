@@ -127,7 +127,7 @@ export class SubscriptionService {
     billingCycle: "monthly" | "yearly"
   ): Promise<PriceCalculation> {
     const plan = await repo.findPlanById(planId);
-    if (!plan) throw new Error("Plan not found");
+    if (!plan) throw new Error("Plan introuvable");
 
     const baseMonthly =
       plan.price_monthly + extraEmployees * plan.extra_employee_price;
@@ -160,10 +160,10 @@ export class SubscriptionService {
     billingCycle: "monthly" | "yearly"
   ): Promise<Subscription> {
     const sub = await repo.findByCompanyId(companyId);
-    if (!sub) throw new Error("Subscription not found");
+    if (!sub) throw new Error("Abonnement introuvable");
 
     const plan = await repo.findPlanById(newPlanId);
-    if (!plan) throw new Error("Plan not found");
+    if (!plan) throw new Error("Plan introuvable");
 
     const now = new Date();
     const periodEnd = new Date(now);
@@ -252,7 +252,7 @@ export class SubscriptionService {
     }
   ): Promise<Subscription> {
     const sub = await repo.findById(subscriptionId);
-    if (!sub) throw new Error("Subscription not found");
+    if (!sub) throw new Error("Abonnement introuvable");
     return repo.update(subscriptionId, data);
   }
 }

@@ -21,7 +21,7 @@ export class AuthService {
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error || !data.session) {
-      throw new Error("Invalid credentials");
+      throw new Error("Identifiants invalides");
     }
 
     const [dbUser] = await db
@@ -31,7 +31,7 @@ export class AuthService {
       .limit(1);
 
     if (!dbUser) {
-      throw new Error("User not found");
+      throw new Error("Utilisateur introuvable");
     }
 
     return {
@@ -51,7 +51,7 @@ export class AuthService {
       );
       const { data, error } = await supabase.auth.getUser(bearerToken);
       if (error || !data.user) {
-        throw new Error("Unauthorized");
+        throw new Error("Non authentifié");
       }
       authUserId = data.user.id;
     } else {
@@ -72,7 +72,7 @@ export class AuthService {
         error,
       } = await supabase.auth.getUser();
       if (error || !authUser) {
-        throw new Error("Unauthorized");
+        throw new Error("Non authentifié");
       }
       authUserId = authUser.id;
     }
@@ -84,7 +84,7 @@ export class AuthService {
       .limit(1);
 
     if (!dbUser) {
-      throw new Error("User not found");
+      throw new Error("Utilisateur introuvable");
     }
 
     return dbUser;

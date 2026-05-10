@@ -11,7 +11,7 @@ export class EmployeesService {
 
   async getByIdInCompany(id: string, companyId: string): Promise<User> {
     const user = await repo.findByIdAndCompanyId(id, companyId);
-    if (!user) throw new Error("Employee not found");
+    if (!user) throw new Error("Employé introuvable");
     return user;
   }
 

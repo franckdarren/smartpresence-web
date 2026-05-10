@@ -16,15 +16,15 @@ export async function GET(req: NextRequest) {
   try {
     const user = await requireRole(["admin", "superadmin"], req);
     if (!user.company_id) {
-      return ApiResponse.error("User has no company", 400);
+      return ApiResponse.error("L'utilisateur n'appartient à aucune entreprise", 400);
     }
     await requireActiveSubscription(user.company_id);
 
     const employees = await service.listByCompany(user.company_id);
-    return ApiResponse.success(employees, "Employees retrieved");
+    return ApiResponse.success(employees, "Employés récupérés");
   } catch (err) {
     if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
-    const message = err instanceof Error ? err.message : "Failed to retrieve employees";
+    const message = err instanceof Error ? err.message : "Erreur lors de la récupération des employés";
     return ApiResponse.error(message, 400);
   }
 }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   try {
     const user = await requireRole(["admin", "superadmin"], req);
     if (!user.company_id) {
-      return ApiResponse.error("User has no company", 400);
+      return ApiResponse.error("L'utilisateur n'appartient à aucune entreprise", 400);
     }
     await requireActiveSubscription(user.company_id);
     await requireEmployeeSlot(user.company_id);
@@ -57,14 +57,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (authError || !authData.user) {
-      return ApiResponse.error(authError?.message ?? "Failed to create auth user", 400);
+      return ApiResponse.error(authError?.message ?? "Échec de la création du compte", 400);
     }
 
     const employee = await service.create(parsed.data, user.company_id, authData.user.id);
-    return ApiResponse.success(employee, "Employee created", 201);
+    return ApiResponse.success(employee, "Employé créé", 201);
   } catch (err) {
     if (err instanceof GuardError) return ApiResponse.error(err.message, err.status);
-    const message = err instanceof Error ? err.message : "Failed to create employee";
+    const message = err instanceof Error ? err.message : "Erreur lors de la création de l'employé";
     return ApiResponse.error(message, 400);
   }
 }

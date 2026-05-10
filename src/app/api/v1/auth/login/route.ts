@@ -12,9 +12,9 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await AuthService.login(parsed.data.email, parsed.data.password);
-    return ApiResponse.success(result, "Login successful");
+    return ApiResponse.success(result, "Connexion réussie");
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Login failed";
+    const message = err instanceof Error ? err.message : "Échec de la connexion";
     return ApiResponse.error(message, 401);
   }
 }

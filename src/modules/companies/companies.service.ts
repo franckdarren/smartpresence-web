@@ -10,13 +10,13 @@ const subscriptionService = new SubscriptionService();
 export class CompaniesService {
   async getById(id: string): Promise<Company> {
     const company = await repo.findById(id);
-    if (!company) throw new Error("Company not found");
+    if (!company) throw new Error("Entreprise introuvable");
     return company;
   }
 
   async getByToken(token: string): Promise<Company> {
     const company = await repo.findByToken(token);
-    if (!company) throw new Error("Company not found");
+    if (!company) throw new Error("Entreprise introuvable");
     return company;
   }
 
