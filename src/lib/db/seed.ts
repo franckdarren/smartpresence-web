@@ -13,6 +13,11 @@ async function seed() {
         max_employees: 15,
         max_sites: 1,
         extra_employee_price: 2000,
+        wifi_check_enabled: false,
+        excel_export_enabled: false,
+        advanced_reports_enabled: false,
+        api_access_enabled: false,
+        history_months: 3,
       },
       {
         name: "business",
@@ -20,6 +25,11 @@ async function seed() {
         max_employees: 50,
         max_sites: 3,
         extra_employee_price: 2000,
+        wifi_check_enabled: true,
+        excel_export_enabled: true,
+        advanced_reports_enabled: false,
+        api_access_enabled: false,
+        history_months: 12,
       },
       {
         name: "enterprise",
@@ -27,6 +37,11 @@ async function seed() {
         max_employees: null,
         max_sites: null,
         extra_employee_price: 2000,
+        wifi_check_enabled: true,
+        excel_export_enabled: true,
+        advanced_reports_enabled: true,
+        api_access_enabled: true,
+        history_months: null,
       },
     ])
     .onConflictDoNothing();

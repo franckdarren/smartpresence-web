@@ -100,8 +100,8 @@ export function AddEmployeeModal() {
             onClick={handleClose}
           />
 
-          <div className="relative w-full max-w-md rounded-xl border border-border bg-card shadow-xl">
-            <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <div className="relative flex max-h-[90vh] w-full max-w-md flex-col rounded-xl border border-border bg-card shadow-xl">
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-6 py-4">
               <h2
                 id="modal-title"
                 className="text-base font-semibold text-card-foreground"
@@ -118,7 +118,7 @@ export function AddEmployeeModal() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 px-6 py-5">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto space-y-4 px-6 py-5">
               {error && (
                 <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                   {error}

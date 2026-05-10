@@ -43,31 +43,22 @@ const STATUS_COLOR: Record<string, string> = {
   cancelled: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
 };
 
-const PLAN_FEATURES: Record<string, string[]> = {
-  starter: [
-    "Jusqu'à 15 employés",
-    "1 site / 1 QR Code",
-    "Pointage GPS + Wi-Fi",
-    "Dashboard admin basique",
-    "Support email",
-  ],
-  business: [
-    "Jusqu'à 50 employés",
-    "Jusqu'à 3 sites / 3 QR Codes",
-    "Pointage GPS + Wi-Fi",
-    "Dashboard complet + exports Excel",
-    "Historique 12 mois",
-    "Support WhatsApp",
-  ],
-  enterprise: [
-    "Employés illimités",
-    "Sites & QR Codes illimités",
-    "API REST complète",
-    "Rapports avancés + exports personnalisés",
-    "Historique illimité",
-    "Support téléphonique dédié + onboarding",
-  ],
-};
+function buildPlanFeatures(plan: { name: string; max_employees: number | null; max_sites: number | null; wifi_check_enabled: boolean; excel_export_enabled: boolean; advanced_reports_enabled: boolean; api_access_enabled: boolean; history_months: number | null }): string[] {
+  const features: string[] = [];
+  features.push(plan.max_employees !== null ? `Jusqu'à ${plan.max_employees} employés` : "Employés illimités");
+  features.push(plan.max_sites !== null ? `Jusqu'à ${plan.max_sites} site${plan.max_sites > 1 ? "s" : ""} / QR Code${plan.max_sites > 1 ? "s" : ""}` : "Sites & QR Codes illimités");
+  if (plan.wifi_check_enabled) features.push("Vérification GPS + Wi-Fi");
+  else features.push("Vérification GPS uniquement");
+  if (plan.excel_export_enabled) features.push("Export CSV/Excel");
+  if (plan.advanced_reports_enabled) features.push("Rapports avancés");
+  if (plan.api_access_enabled) features.push("Accès API REST complète");
+  if (plan.history_months !== null) features.push(`Historique ${plan.history_months} mois`);
+  else features.push("Historique illimité");
+  if (plan.name === "starter") features.push("Support email");
+  if (plan.name === "business") features.push("Support WhatsApp");
+  if (plan.name === "enterprise") features.push("Support téléphonique dédié + onboarding");
+  return features;
+}
 
 
 export default async function MySubscriptionPage() {
@@ -260,7 +251,7 @@ export default async function MySubscriptionPage() {
             Fonctionnalités incluses
           </p>
           <ul className="grid gap-1.5 sm:grid-cols-2">
-            {(PLAN_FEATURES[plan.name] ?? []).map((f) => (
+            {buildPlanFeatures(plan).map((f) => (
               <li key={f} className="flex items-center gap-2 text-sm text-card-foreground">
                 <CheckCircle className="h-4 w-4 shrink-0 text-emerald-500" />
                 {f}

@@ -1,4 +1,5 @@
 import {
+  boolean,
   doublePrecision,
   integer,
   pgTable,
@@ -10,11 +11,27 @@ import {
 export const companies = pgTable("companies", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
+  // Legacy fields kept for backward compat — the canonical data lives in `sites`
   wifi_ssid: text("wifi_ssid"),
   latitude: doublePrecision("latitude").notNull(),
   longitude: doublePrecision("longitude").notNull(),
   radius: integer("radius").notNull().default(100),
   company_token: uuid("company_token").notNull().unique().defaultRandom(),
+  created_at: timestamp("created_at").defaultNow(),
+});
+
+// ─── SITES ───────────────────────────────────────────────────
+// Each company can have 1..N sites depending on their plan.
+// A site has its own QR token, GPS coordinates, radius, and optional Wi-Fi.
+export const sites = pgTable("sites", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  company_id: uuid("company_id").notNull().references(() => companies.id),
+  name: text("name").notNull(),
+  latitude: doublePrecision("latitude").notNull(),
+  longitude: doublePrecision("longitude").notNull(),
+  radius: integer("radius").notNull().default(100),
+  wifi_ssid: text("wifi_ssid"),
+  qr_token: uuid("qr_token").notNull().unique().defaultRandom(),
   created_at: timestamp("created_at").defaultNow(),
 });
 
@@ -32,6 +49,7 @@ export const users = pgTable("users", {
 export const attendances = pgTable("attendances", {
   id: uuid("id").primaryKey().defaultRandom(),
   user_id: uuid("user_id").notNull().references(() => users.id),
+  site_id: uuid("site_id").references(() => sites.id), // nullable for legacy records
   check_in: timestamp("check_in").notNull(),
   check_out: timestamp("check_out"),
   latitude: doublePrecision("latitude").notNull(),
@@ -47,9 +65,15 @@ export const plans = pgTable("plans", {
     .notNull()
     .unique(),
   price_monthly: integer("price_monthly").notNull(),
-  max_employees: integer("max_employees"),   // null = illimité
-  max_sites: integer("max_sites"),           // null = illimité
+  max_employees: integer("max_employees"),          // null = illimité
+  max_sites: integer("max_sites"),                  // null = illimité
   extra_employee_price: integer("extra_employee_price").notNull().default(2000),
+  // ── Capacités fonctionnelles ──────────────────────────────
+  wifi_check_enabled: boolean("wifi_check_enabled").notNull().default(false),
+  excel_export_enabled: boolean("excel_export_enabled").notNull().default(false),
+  advanced_reports_enabled: boolean("advanced_reports_enabled").notNull().default(false),
+  api_access_enabled: boolean("api_access_enabled").notNull().default(false),
+  history_months: integer("history_months"),        // null = illimité
   created_at: timestamp("created_at").defaultNow(),
 });
 
@@ -104,17 +128,19 @@ export const paymentRequests = pgTable("payment_requests", {
 });
 
 // Types inférés
-export type Company = typeof companies.$inferSelect;
+export type Company    = typeof companies.$inferSelect;
 export type NewCompany = typeof companies.$inferInsert;
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
+export type Site       = typeof sites.$inferSelect;
+export type NewSite    = typeof sites.$inferInsert;
+export type User       = typeof users.$inferSelect;
+export type NewUser    = typeof users.$inferInsert;
 export type Attendance = typeof attendances.$inferSelect;
 export type NewAttendance = typeof attendances.$inferInsert;
-export type Plan = typeof plans.$inferSelect;
-export type NewPlan = typeof plans.$inferInsert;
-export type Subscription = typeof subscriptions.$inferSelect;
+export type Plan       = typeof plans.$inferSelect;
+export type NewPlan    = typeof plans.$inferInsert;
+export type Subscription    = typeof subscriptions.$inferSelect;
 export type NewSubscription = typeof subscriptions.$inferInsert;
-export type NotificationLog = typeof notificationLogs.$inferSelect;
+export type NotificationLog    = typeof notificationLogs.$inferSelect;
 export type NewNotificationLog = typeof notificationLogs.$inferInsert;
-export type PaymentRequest = typeof paymentRequests.$inferSelect;
+export type PaymentRequest    = typeof paymentRequests.$inferSelect;
 export type NewPaymentRequest = typeof paymentRequests.$inferInsert;

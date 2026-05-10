@@ -1,10 +1,10 @@
 import { AttendanceRepository } from "./attendance.repository";
-import { CompaniesRepository } from "@/modules/companies/companies.repository";
+import { SitesRepository } from "@/modules/sites/sites.repository";
 import type { CheckAttendanceInput } from "./attendance.validator";
 import type { Attendance, User } from "@/lib/db/schema";
 
 const attendanceRepo = new AttendanceRepository();
-const companiesRepo = new CompaniesRepository();
+const sitesRepo = new SitesRepository();
 
 function haversineDistance(
   lat1: number,
@@ -33,31 +33,32 @@ export class CheckAttendanceService {
     input: CheckAttendanceInput,
     user: User
   ): Promise<CheckAttendanceResult> {
-    const company = await companiesRepo.findByToken(input.company_token);
-    if (!company) {
-      throw new Error("Company not found");
+    // Look up site by qr_token (the `company_token` field in the payload is the site's qr_token)
+    const site = await sitesRepo.findByQrToken(input.company_token);
+    if (!site) {
+      throw new Error("QR Code invalide ou site introuvable");
     }
 
-    if (user.company_id !== company.id) {
-      throw new Error("You do not belong to this company");
+    if (user.company_id !== site.company_id) {
+      throw new Error("Vous n'appartenez pas à cette entreprise");
     }
 
     const distance = haversineDistance(
       input.latitude,
       input.longitude,
-      company.latitude,
-      company.longitude
+      site.latitude,
+      site.longitude
     );
 
-    if (distance > company.radius) {
+    if (distance > site.radius) {
       throw new Error(
-        `You are too far from the office (${Math.round(distance)}m, max ${company.radius}m)`
+        `Vous êtes trop loin du site (${Math.round(distance)}m, max ${site.radius}m)`
       );
     }
 
-    if (company.wifi_ssid && input.wifi_ssid) {
-      if (company.wifi_ssid !== input.wifi_ssid) {
-        throw new Error("Wi-Fi network does not match the office network");
+    if (site.wifi_ssid && input.wifi_ssid) {
+      if (site.wifi_ssid !== input.wifi_ssid) {
+        throw new Error("Le réseau Wi-Fi ne correspond pas au site");
       }
     }
 
@@ -66,6 +67,7 @@ export class CheckAttendanceService {
     if (!existing) {
       const attendance = await attendanceRepo.createCheckIn({
         user_id: user.id,
+        site_id: site.id,
         check_in: new Date(),
         latitude: input.latitude,
         longitude: input.longitude,

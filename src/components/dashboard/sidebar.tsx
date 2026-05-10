@@ -10,6 +10,7 @@ import {
   Globe,
   Building2,
   CreditCard,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "@/components/brand-logo";
@@ -20,6 +21,7 @@ const adminNavItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Employés", href: "/employees", icon: Users },
   { label: "Présences", href: "/attendance", icon: CalendarCheck },
+  { label: "Sites", href: "/sites", icon: MapPin },
   { label: "Paramètres", href: "/settings", icon: Settings },
   { label: "Mon abonnement", href: "/my-subscription", icon: CreditCard },
 ];

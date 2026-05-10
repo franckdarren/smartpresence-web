@@ -4,10 +4,12 @@ import {
   type SubscriptionWithCompanyAndPlan,
 } from "./subscription.repository";
 import { EmployeesRepository } from "@/modules/employees/employees.repository";
+import { SitesRepository } from "@/modules/sites/sites.repository";
 import type { Plan, Subscription } from "@/lib/db/schema";
 
 const repo = new SubscriptionRepository();
 const employeeRepo = new EmployeesRepository();
+const sitesRepo = new SitesRepository();
 
 export type SubscriptionStats = {
   current_employees: number;
@@ -108,14 +110,13 @@ export class SubscriptionService {
     if (!subWithPlan) return { allowed: false, current: 0, max: 0 };
 
     const { plan } = subWithPlan;
-    // Dans le schéma actuel, une entreprise a toujours 1 site (1 QR code)
-    const current = 1;
+    const current = await sitesRepo.countByCompanyId(companyId);
 
     if (plan.max_sites === null) {
       return { allowed: true, current, max: null };
     }
 
-    return { allowed: current <= plan.max_sites, current, max: plan.max_sites };
+    return { allowed: current < plan.max_sites, current, max: plan.max_sites };
   }
 
   // ── Calcul prix ───────────────────────────────────────────
@@ -203,13 +204,15 @@ export class SubscriptionService {
         ? plan.max_employees + extra_employees
         : null;
 
+    const currentSites = await sitesRepo.countByCompanyId(companyId);
+
     return {
       subscription: { ...sub, extra_employees },
       plan,
       stats: {
         current_employees: currentEmployees,
         max_employees: maxEmployees,
-        current_sites: 1,
+        current_sites: currentSites,
         max_sites: plan.max_sites,
         is_active: isActive,
         days_remaining: daysRemaining,
@@ -221,6 +224,18 @@ export class SubscriptionService {
 
   async getAllSubscriptions(): Promise<SubscriptionWithCompanyAndPlan[]> {
     return repo.findAllWithCompanyAndPlan();
+  }
+
+  // ── Auto-expiration ───────────────────────────────────────
+
+  async expireStaleSubscriptions(): Promise<{ expired: number }> {
+    const stale = await repo.findExpired();
+    let expired = 0;
+    for (const sub of stale) {
+      await repo.update(sub.id, { status: "expired" });
+      expired++;
+    }
+    return { expired };
   }
 
   // ── Superadmin : mise à jour manuelle ─────────────────────

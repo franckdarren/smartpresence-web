@@ -47,13 +47,12 @@ export async function requireSameCompany(companyId: string, req: NextRequest): P
 
 /**
  * Vérifie que l'abonnement de l'entreprise est actif (trial en cours ou active).
- * À appeler après requireAuth/requireRole en passant user.company_id.
  * Les superadmins (company_id = null) sont toujours exemptés.
  */
 export async function requireActiveSubscription(
   companyId: string | null | undefined
 ): Promise<void> {
-  if (!companyId) return; // superadmin ou pas d'entreprise
+  if (!companyId) return;
   const isActive = await subscriptionService.isSubscriptionActive(companyId);
   if (!isActive) {
     throw new GuardError(
@@ -65,7 +64,6 @@ export async function requireActiveSubscription(
 
 /**
  * Vérifie qu'il reste des slots employés disponibles sur l'abonnement.
- * À appeler après requireAuth/requireRole en passant user.company_id.
  */
 export async function requireEmployeeSlot(
   companyId: string | null | undefined
@@ -82,7 +80,6 @@ export async function requireEmployeeSlot(
 
 /**
  * Vérifie qu'il reste des slots de sites disponibles sur l'abonnement.
- * À appeler après requireAuth/requireRole en passant user.company_id.
  */
 export async function requireSiteSlot(
   companyId: string | null | undefined
@@ -93,6 +90,53 @@ export async function requireSiteSlot(
     throw new GuardError(
       403,
       "Limite de sites atteinte. Passez à un plan supérieur."
+    );
+  }
+}
+
+export type PlanFeature = "wifi_check" | "excel_export" | "advanced_reports" | "api_access";
+
+const FEATURE_LABELS: Record<PlanFeature, string> = {
+  wifi_check: "Vérification Wi-Fi",
+  excel_export: "Export CSV/Excel",
+  advanced_reports: "Rapports avancés",
+  api_access: "Accès API REST",
+};
+
+const FEATURE_PLAN_HINT: Record<PlanFeature, string> = {
+  wifi_check: "Business ou supérieur",
+  excel_export: "Business ou supérieur",
+  advanced_reports: "Enterprise",
+  api_access: "Enterprise",
+};
+
+/**
+ * Vérifie qu'une fonctionnalité est disponible sur le plan actuel.
+ * Lance GuardError(403) si non disponible.
+ */
+export async function requireFeature(
+  companyId: string | null | undefined,
+  feature: PlanFeature
+): Promise<void> {
+  if (!companyId) return;
+
+  const data = await subscriptionService.getSubscriptionWithStats(companyId);
+  if (!data) {
+    throw new GuardError(403, "Abonnement introuvable");
+  }
+
+  const { plan } = data;
+  const featureMap: Record<PlanFeature, boolean> = {
+    wifi_check: plan.wifi_check_enabled,
+    excel_export: plan.excel_export_enabled,
+    advanced_reports: plan.advanced_reports_enabled,
+    api_access: plan.api_access_enabled,
+  };
+
+  if (!featureMap[feature]) {
+    throw new GuardError(
+      403,
+      `${FEATURE_LABELS[feature]} est disponible à partir du plan ${FEATURE_PLAN_HINT[feature]}.`
     );
   }
 }

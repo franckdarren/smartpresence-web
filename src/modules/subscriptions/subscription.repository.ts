@@ -118,6 +118,20 @@ export class SubscriptionRepository {
     return sub;
   }
 
+  async findExpired(): Promise<Subscription[]> {
+    const now = new Date();
+    const all = await db.select().from(subscriptions);
+    return all.filter((s) => {
+      if (s.status === "trial") {
+        return s.trial_ends_at != null && new Date(s.trial_ends_at) < now;
+      }
+      if (s.status === "active") {
+        return new Date(s.current_period_end) < now;
+      }
+      return false;
+    });
+  }
+
   async create(data: NewSubscription): Promise<Subscription> {
     const [sub] = await db.insert(subscriptions).values(data).returning();
     return sub;
