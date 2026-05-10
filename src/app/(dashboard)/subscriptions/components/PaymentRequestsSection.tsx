@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   Clock,
   CheckCircle,
@@ -39,6 +40,7 @@ const STATUS_CONFIG = {
 } as const;
 
 export function PaymentRequestsSection() {
+  const router = useRouter();
   const [requests, setRequests] = useState<PaymentRequestRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<PaymentRequestRow | null>(null);
@@ -62,6 +64,7 @@ export function PaymentRequestsSection() {
   function handleReviewed() {
     setSelected(null);
     load();
+    router.refresh();
   }
 
   const filtered =
