@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import type { Plan, Subscription } from "@/lib/db/schema";
 
 type SubscriptionRow = Subscription & { plan: Plan; company_name: string };
@@ -69,6 +70,7 @@ export function EditSubscriptionModal({
         setError(json.message ?? "Erreur lors de la sauvegarde");
         return;
       }
+      toast.success("Abonnement modifié avec succès.");
       onSaved();
     } catch {
       setError("Impossible de contacter le serveur.");

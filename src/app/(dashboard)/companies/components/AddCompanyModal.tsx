@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X, Building2, Loader2, MapPin } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface FormState {
@@ -134,6 +135,7 @@ export function AddCompanyModal() {
         return;
       }
 
+      toast.success("Entreprise créée avec succès.");
       handleClose();
       router.refresh();
     } catch {

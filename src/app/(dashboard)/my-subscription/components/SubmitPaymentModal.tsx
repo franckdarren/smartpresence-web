@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { X, Loader2, Upload, FileText, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 import type { Plan } from "@/lib/db/schema";
 
 const PLAN_NAMES: Record<string, string> = {
@@ -58,6 +59,7 @@ export function SubmitPaymentModal({ plans, currentPlanName, defaultPlanId, onCl
         setError(json.message ?? "Erreur lors de la soumission");
         return;
       }
+      toast.success("Demande de paiement soumise. Traitement sous 24h ouvrées.");
       onSubmitted();
     } catch {
       setError("Impossible de contacter le serveur.");

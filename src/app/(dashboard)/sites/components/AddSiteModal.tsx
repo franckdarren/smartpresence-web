@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Loader2, MapPin, X, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 interface Props {
   maxSites: number | null;
@@ -45,6 +46,7 @@ export function AddSiteModal({ maxSites, currentSites, wifiEnabled }: Props) {
       });
       const json = await res.json();
       if (!json.success) { setError(json.message ?? "Erreur"); return; }
+      toast.success("Site créé avec succès.");
       setOpen(false);
       setForm({ name: "", latitude: "", longitude: "", radius: "100", wifi_ssid: "" });
       router.refresh();

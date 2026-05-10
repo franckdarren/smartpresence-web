@@ -12,6 +12,7 @@ import {
   MapPin,
   Radius,
 } from "lucide-react";
+import { toast } from "sonner";
 import type { Site } from "@/lib/db/schema";
 
 interface Props {
@@ -36,6 +37,7 @@ export function SiteCard({ site, wifiEnabled }: Props) {
       const json = await res.json();
       if (!json.success) { setError(json.message ?? "Erreur"); return; }
       setToken(json.data.qr_token);
+      toast.success("QR Code régénéré avec succès.");
     } catch {
       setError("Impossible de contacter le serveur.");
     } finally {
@@ -50,6 +52,7 @@ export function SiteCard({ site, wifiEnabled }: Props) {
       const res = await fetch(`/api/v1/sites/${site.id}`, { method: "DELETE" });
       const json = await res.json();
       if (!json.success) { setError(json.message ?? "Erreur"); return; }
+      toast.success(`Site "${site.name}" supprimé.`);
       router.refresh();
     } catch {
       setError("Impossible de contacter le serveur.");

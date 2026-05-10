@@ -8,6 +8,7 @@ import {
   XCircle,
   ExternalLink,
 } from "lucide-react";
+import { toast } from "sonner";
 import type { Plan } from "@/lib/db/schema";
 
 const PLAN_NAMES: Record<string, string> = {
@@ -66,6 +67,7 @@ export function ReviewPaymentModal({ request, onClose, onReviewed }: Props) {
         setError(json.message ?? "Erreur lors du traitement");
         return;
       }
+      toast.success(action === "approve" ? "Paiement approuvé et abonnement activé." : "Demande rejetée.");
       onReviewed();
     } catch {
       setError("Impossible de contacter le serveur.");

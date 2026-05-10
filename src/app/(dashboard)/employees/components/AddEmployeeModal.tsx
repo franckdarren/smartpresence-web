@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X, UserPlus, Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface FormState {
@@ -69,6 +70,7 @@ export function AddEmployeeModal() {
         return;
       }
 
+      toast.success("Employé créé avec succès.");
       handleClose();
       router.refresh();
     } catch {

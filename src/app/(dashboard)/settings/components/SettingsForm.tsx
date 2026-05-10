@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { QRCodeCanvas } from "qrcode.react";
-import { Download, RefreshCw, Loader2, Save, CheckCircle } from "lucide-react";
+import { Download, RefreshCw, Loader2, Save } from "lucide-react";
+import { toast } from "sonner";
 import type { Company } from "@/lib/db/schema";
 
 interface Props {
@@ -30,12 +31,6 @@ export function SettingsForm({ company }: Props) {
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  function showSuccess(msg: string) {
-    setSuccess(msg);
-    setTimeout(() => setSuccess(null), 3000);
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -59,7 +54,7 @@ export function SettingsForm({ company }: Props) {
         return;
       }
 
-      showSuccess("Paramètres sauvegardés avec succès.");
+      toast.success("Paramètres sauvegardés avec succès.");
       router.refresh();
     } catch {
       setError("Impossible de contacter le serveur.");
@@ -91,7 +86,7 @@ export function SettingsForm({ company }: Props) {
       }
 
       setToken(json.data.company_token);
-      showSuccess("QR Code régénéré avec succès.");
+      toast.success("QR Code régénéré avec succès.");
     } catch {
       setError("Impossible de contacter le serveur.");
     } finally {
@@ -130,13 +125,6 @@ export function SettingsForm({ company }: Props) {
             {error && (
               <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                 {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-400">
-                <CheckCircle className="h-4 w-4 shrink-0" />
-                {success}
               </div>
             )}
 
