@@ -102,3 +102,38 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
 }
+
+/* FAQ accordion toggle animation */
+details summary::-webkit-details-marker { display: none; }
+details[open] .faq-toggle { transform: rotate(45deg); }
+.faq-toggle { transition: transform 0.2s ease; }
+
+/* Landing page color tokens — light */
+:root {
+  --lp-bg: #ffffff;
+  --lp-ink: #0b1220;
+  --lp-muted: #5b6573;
+  --lp-line: #e5e8ee;
+  --lp-soft: #f6f8fb;
+  --lp-accent: #10b981;
+  --lp-accent-dark: #047857;
+  --lp-navy: #0b1220;
+  --lp-active-item: #ffffff;
+  --lp-bar-track: #f1f5f9;
+  --lp-dash-shadow: 0 30px 60px -20px rgba(11, 18, 32, 0.25);
+}
+
+/* Landing page color tokens — dark */
+.dark {
+  --lp-bg: #0a0f1a;
+  --lp-ink: #f1f5f9;
+  --lp-muted: #94a3b8;
+  --lp-line: #1e293b;
+  --lp-soft: #0f172a;
+  --lp-accent: #10b981;
+  --lp-accent-dark: #34d399;
+  --lp-navy: #050811;
+  --lp-active-item: #0a0f1a;
+  --lp-bar-track: #1e293b;
+  --lp-dash-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
