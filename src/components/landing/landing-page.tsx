@@ -235,7 +235,7 @@ function DashboardMock() {
 function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <>
+    <div className="lp-nav-wrapper">
       <header className="lp-nav" style={{ borderBottom: `1px solid ${T.line}`, background: T.bg }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <LogoMark />
@@ -271,7 +271,7 @@ function Nav() {
           <a href="/register" style={{ flex: 1, textAlign: "center", padding: "11px", color: "#fff", background: T.navy, textDecoration: "none", fontWeight: 600, fontSize: 14, borderRadius: 8 }}>Essai gratuit</a>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

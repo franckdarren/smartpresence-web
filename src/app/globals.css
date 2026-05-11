@@ -109,11 +109,12 @@ details[open] .faq-toggle { transform: rotate(45deg); }
 .faq-toggle { transition: transform 0.2s ease; }
 
 /* ── Landing page responsive layout ──────────────────────────────────────── */
-.lp-nav { display:flex; align-items:center; justify-content:space-between; padding:20px 56px; position:sticky; top:0; z-index:10; }
+.lp-nav-wrapper { position:sticky; top:0; z-index:10; }
+.lp-nav { display:flex; align-items:center; justify-content:space-between; padding:20px 56px; position:relative; }
 .lp-nav-links { display:flex; gap:32px; }
 .lp-nav-actions { display:flex; align-items:center; gap:10px; }
 .lp-mobile-menu-btn { display:none; background:none; border:none; cursor:pointer; padding:4px; }
-.lp-mobile-menu { display:none; flex-direction:column; }
+.lp-mobile-menu { display:none; flex-direction:column; position:absolute; top:100%; left:0; right:0; z-index:9; }
 .lp-mobile-menu.lp-open { display:flex; gap:0; padding:12px 20px 16px; }
 
 .lp-hero-section { padding:80px 56px 100px; position:relative; overflow:hidden; }
