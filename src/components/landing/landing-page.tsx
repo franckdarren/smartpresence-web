@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { CSSProperties } from "react";
 
 // ── Design tokens (CSS variables — switch via .dark class) ─────────────────
@@ -67,7 +70,7 @@ const FAQ_ITEMS = [
 ];
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────
-type IconName = "qr" | "gps" | "wifi" | "clock" | "shield" | "api" | "check" | "arrow" | "menu";
+type IconName = "qr" | "gps" | "wifi" | "clock" | "shield" | "api" | "check" | "arrow" | "menu" | "x";
 
 function Icon({ name, size = 20, stroke = "currentColor", strokeWidth = 1.5 }: {
   name: IconName; size?: number; stroke?: string; strokeWidth?: number;
@@ -83,6 +86,7 @@ function Icon({ name, size = 20, stroke = "currentColor", strokeWidth = 1.5 }: {
     case "check": return <svg {...p}><path d="M5 12l5 5L20 7"/></svg>;
     case "arrow": return <svg {...p}><path d="M5 12h14M13 6l6 6-6 6"/></svg>;
     case "menu": return <svg {...p}><path d="M4 7h16M4 12h16M4 17h16"/></svg>;
+    case "x": return <svg {...p}><path d="M18 6L6 18M6 6l12 12"/></svg>;
     default: return null;
   }
 }
@@ -229,43 +233,65 @@ function DashboardMock() {
 
 // ── Sections ───────────────────────────────────────────────────────────────
 function Nav() {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 56px", borderBottom: `1px solid ${T.line}`, background: T.bg, position: "sticky", top: 0, zIndex: 10 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <LogoMark />
-        <span style={{ fontSize: 17, fontWeight: 600, color: T.ink, letterSpacing: -0.2 }}>SmartPresence</span>
-      </div>
-      <nav style={{ display: "flex", gap: 32 }}>
+    <>
+      <header className="lp-nav" style={{ borderBottom: `1px solid ${T.line}`, background: T.bg }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <LogoMark />
+          <span style={{ fontSize: 17, fontWeight: 600, color: T.ink, letterSpacing: -0.2 }}>SmartPresence</span>
+        </div>
+        <nav className="lp-nav-links">
+          {NAV_LINKS.map(n => (
+            <a key={n.href} href={n.href} style={{ fontSize: 14, color: T.muted, textDecoration: "none", fontWeight: 500 }}>{n.label}</a>
+          ))}
+        </nav>
+        <div className="lp-nav-actions">
+          <a href="/login" className="lp-nav-login" style={{ fontSize: 14, fontWeight: 500, color: T.ink, textDecoration: "none" }}>Connexion</a>
+          <a href="/register" style={{ fontSize: 14, fontWeight: 600, color: "#fff", background: T.navy, padding: "10px 16px", borderRadius: 8, textDecoration: "none" }}>Essai gratuit</a>
+        </div>
+        <button
+          className="lp-mobile-menu-btn"
+          onClick={() => setMenuOpen(o => !o)}
+          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          style={{ color: T.ink }}
+        >
+          <Icon name={menuOpen ? "x" : "menu"} size={24} stroke={T.ink} />
+        </button>
+      </header>
+      <div className={`lp-mobile-menu${menuOpen ? " lp-open" : ""}`} style={{ background: T.bg, borderBottom: menuOpen ? `1px solid ${T.line}` : "none" }}>
         {NAV_LINKS.map(n => (
-          <a key={n.href} href={n.href} style={{ fontSize: 14, color: T.muted, textDecoration: "none", fontWeight: 500 }}>{n.label}</a>
+          <a key={n.href} href={n.href} onClick={() => setMenuOpen(false)}
+            style={{ fontSize: 15, color: T.ink, textDecoration: "none", fontWeight: 500, padding: "12px 0", borderBottom: `1px solid ${T.line}` }}>
+            {n.label}
+          </a>
         ))}
-      </nav>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        
-        <a href="/login" style={{ fontSize: 14, fontWeight: 500, color: T.ink, textDecoration: "none" }}>Connexion</a>
-        <a href="/register" style={{ fontSize: 14, fontWeight: 600, color: "#fff", background: T.navy, padding: "10px 16px", borderRadius: 8, textDecoration: "none" }}>Essai gratuit</a>
+        <div style={{ display: "flex", gap: 8, paddingTop: 14 }}>
+          <a href="/login" style={{ flex: 1, textAlign: "center", padding: "11px", color: T.ink, textDecoration: "none", fontWeight: 500, fontSize: 14, border: `1px solid ${T.line}`, borderRadius: 8 }}>Connexion</a>
+          <a href="/register" style={{ flex: 1, textAlign: "center", padding: "11px", color: "#fff", background: T.navy, textDecoration: "none", fontWeight: 600, fontSize: 14, borderRadius: 8 }}>Essai gratuit</a>
+        </div>
       </div>
-    </header>
+    </>
   );
 }
 
 function Hero() {
   return (
-    <section style={{ padding: "80px 56px 100px", background: T.bg, position: "relative", overflow: "hidden" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 48, alignItems: "center", maxWidth: 1280, margin: "0 auto" }}>
+    <section className="lp-hero-section" style={{ background: T.bg }}>
+      <div className="lp-hero-grid">
         <div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 999, border: `1px solid ${T.line}`, fontSize: 12, color: T.muted, marginBottom: 24, fontWeight: 500 }}>
             <span style={{ width: 6, height: 6, borderRadius: 3, background: T.accent, display: "inline-block" }} />
             Nouveau · Application mobile disponible sur Android
           </div>
-          <h1 style={{ fontSize: 64, fontWeight: 600, lineHeight: 1.05, color: T.ink, letterSpacing: -1.5, margin: 0 }}>
+          <h1 className="lp-hero-h1" style={{ fontWeight: 600, lineHeight: 1.05, color: T.ink, margin: 0 }}>
             La présence<br />de vos équipes,<br />
             <span style={{ color: T.muted }}>vérifiée au mètre près.</span>
           </h1>
-          <p style={{ fontSize: 18, lineHeight: 1.6, color: T.muted, maxWidth: 520, marginTop: 24, marginBottom: 0 }}>
+          <p className="lp-hero-desc" style={{ lineHeight: 1.6, color: T.muted, maxWidth: 520, marginTop: 24, marginBottom: 0 }}>
             SmartPresence remplace les feuilles de présence et les badgeuses par un pointage QR Code + GPS + Wi-Fi. Conçu pour les entreprises africaines, des PME aux grands groupes.
           </p>
-          <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+          <div className="lp-hero-actions">
             <a href="/register" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 22px", background: T.navy, color: "#fff", borderRadius: 10, fontWeight: 600, fontSize: 15, textDecoration: "none" }}>
               Démarrer 1 mois gratuit
               <Icon name="arrow" size={16} stroke="#fff" strokeWidth={2} />
@@ -274,7 +300,7 @@ function Hero() {
               Voir une démo
             </a>
           </div>
-          <div style={{ display: "flex", gap: 32, marginTop: 40, paddingTop: 24, borderTop: `1px solid ${T.line}` }}>
+          <div className="lp-hero-stats" style={{ borderTop: `1px solid ${T.line}` }}>
             {[{ v: "< 1s", l: "Validation de pointage" }, { v: "100m", l: "Rayon GPS par site" }, { v: "API", l: "REST documentée" }].map((s, i) => (
               <div key={i}>
                 <div style={{ fontSize: 22, fontWeight: 600, color: T.ink, letterSpacing: -0.5 }}>{s.v}</div>
@@ -283,7 +309,7 @@ function Hero() {
             ))}
           </div>
         </div>
-        <div style={{ position: "relative", height: 600 }}>
+        <div className="lp-hero-visual">
           <div style={{ position: "absolute", top: 20, right: 0 }}>
             <DashboardMock />
           </div>
@@ -299,13 +325,13 @@ function Hero() {
 
 function Steps() {
   return (
-    <section id="how" style={{ padding: "100px 56px", background: T.soft, borderTop: `1px solid ${T.line}` }}>
+    <section id="how" className="lp-section" style={{ background: T.soft, borderTop: `1px solid ${T.line}` }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ fontSize: 12, color: T.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>Comment ça marche</div>
-        <h2 style={{ fontSize: 44, fontWeight: 600, color: T.ink, letterSpacing: -1, margin: 0, maxWidth: 720 }}>
+        <h2 className="lp-section-h2" style={{ fontWeight: 600, color: T.ink, margin: 0, maxWidth: 720 }}>
           Trois étapes pour digitaliser le pointage de votre entreprise.
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24, marginTop: 56 }}>
+        <div className="lp-steps-grid">
           {STEPS.map((s, i) => (
             <div key={i} style={{ padding: 32, background: T.bg, borderRadius: 14, border: `1px solid ${T.line}` }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
@@ -324,12 +350,12 @@ function Steps() {
 
 function Features() {
   return (
-    <section id="features" style={{ padding: "100px 56px", background: T.bg }}>
+    <section id="features" className="lp-section" style={{ background: T.bg }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 64, marginBottom: 56 }}>
+        <div className="lp-features-header">
           <div>
             <div style={{ fontSize: 12, color: T.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>Fonctionnalités</div>
-            <h2 style={{ fontSize: 44, fontWeight: 600, color: T.ink, letterSpacing: -1, margin: 0 }}>
+            <h2 className="lp-section-h2" style={{ fontWeight: 600, color: T.ink, margin: 0 }}>
               Tout ce qu&apos;il faut pour suivre la présence.
             </h2>
           </div>
@@ -337,7 +363,7 @@ function Features() {
             Pensé pour fonctionner sur le terrain : connexion intermittente, multi-sites, chantiers ou bureaux. Pas de matériel à acheter, pas d&apos;installation lourde.
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: T.line, border: `1px solid ${T.line}`, borderRadius: 14, overflow: "hidden" }}>
+        <div className="lp-features-grid" style={{ background: T.line, border: `1px solid ${T.line}`, borderRadius: 14, overflow: "hidden" }}>
           {FEATURES.map((f, i) => (
             <div key={i} style={{ padding: 32, background: T.bg, minHeight: 200 }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: "#10b98114", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
@@ -361,18 +387,18 @@ function Security() {
     { t: "Conformité RGPD", d: "Hébergement régional, droit à l'oubli et exports complets sur demande." },
   ];
   return (
-    <section id="security" style={{ padding: "100px 56px", background: T.navy, color: "#fff" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+    <section id="security" className="lp-security-section" style={{ background: T.navy, color: "#fff" }}>
+      <div className="lp-security-inner">
         <div>
           <div style={{ fontSize: 12, color: T.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>Sécurité & conformité</div>
-          <h2 style={{ fontSize: 40, fontWeight: 600, letterSpacing: -1, margin: 0, lineHeight: 1.1 }}>
+          <h2 className="lp-section-h2" style={{ fontWeight: 600, letterSpacing: -1, margin: 0, lineHeight: 1.1 }}>
             Vos données restent les vôtres. Isolation stricte par entreprise.
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.7, color: "rgba(255,255,255,.65)", marginTop: 20, maxWidth: 480, marginBottom: 0 }}>
             SmartPresence est multi-tenant par conception. Chaque pointage est rattaché à votre entreprise via Row Level Security PostgreSQL et JWT signés.
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: "rgba(255,255,255,.08)", borderRadius: 14, overflow: "hidden" }}>
+        <div className="lp-security-badges" style={{ background: "rgba(255,255,255,.08)", borderRadius: 14, overflow: "hidden" }}>
           {badges.map((b, i) => (
             <div key={i} style={{ padding: 24, background: T.navy }}>
               <Icon name="shield" size={20} stroke={T.accent} strokeWidth={1.75} />
@@ -388,11 +414,11 @@ function Security() {
 
 function Pricing() {
   return (
-    <section id="pricing" style={{ padding: "100px 56px", background: T.bg }}>
+    <section id="pricing" className="lp-section" style={{ background: T.bg }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <div style={{ fontSize: 12, color: T.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>Tarifs</div>
-          <h2 style={{ fontSize: 44, fontWeight: 600, color: T.ink, letterSpacing: -1, margin: 0 }}>Simple. Transparent. Sans engagement.</h2>
+          <h2 className="lp-section-h2" style={{ fontWeight: 600, color: T.ink, margin: 0 }}>Simple. Transparent. Sans engagement.</h2>
           <p style={{ fontSize: 16, color: T.muted, marginTop: 14, maxWidth: 560, marginLeft: "auto", marginRight: "auto", marginBottom: 0 }}>
             1 mois gratuit pour tester. Paiement annuel : 2 mois offerts. Mobile Money (Airtel Money, Moov Money) accepté.
           </p>
@@ -404,7 +430,7 @@ function Pricing() {
             </span>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+        <div className="lp-pricing-grid">
           {PLANS.map((p, i) => (
             <div key={i} style={{ padding: 32, borderRadius: 16, background: p.popular ? T.navy : T.bg, color: p.popular ? "#fff" : T.ink, border: p.popular ? "1px solid transparent" : `1px solid ${T.line}`, position: "relative" }}>
               {p.popular && (
@@ -430,7 +456,7 @@ function Pricing() {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 24, padding: "16px 24px", background: T.soft, border: `1px solid ${T.line}`, borderRadius: 10, fontSize: 13, color: T.muted, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="lp-pricing-addon" style={{ marginTop: 24, padding: "16px 24px", background: T.soft, border: `1px solid ${T.line}`, borderRadius: 10, fontSize: 13, color: T.muted }}>
           <span><strong style={{ color: T.ink }}>Add-on</strong> · Au-delà du palier : +2 000 FCFA / employé supplémentaire / mois.</span>
           <span>Tous les plans · Mobile Money accepté</span>
         </div>
@@ -441,11 +467,11 @@ function Pricing() {
 
 function FAQ() {
   return (
-    <section id="faq" style={{ padding: "100px 56px", background: T.soft }}>
+    <section id="faq" className="lp-section" style={{ background: T.soft }}>
       <div style={{ maxWidth: 920, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{ fontSize: 12, color: T.accent, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>FAQ</div>
-          <h2 style={{ fontSize: 40, fontWeight: 600, color: T.ink, letterSpacing: -1, margin: 0 }}>Questions fréquentes</h2>
+          <h2 className="lp-section-h2" style={{ fontWeight: 600, color: T.ink, margin: 0 }}>Questions fréquentes</h2>
         </div>
         <div style={{ background: T.bg, border: `1px solid ${T.line}`, borderRadius: 14, overflow: "hidden" }}>
           {FAQ_ITEMS.map((f, i) => (
@@ -465,21 +491,23 @@ function FAQ() {
 
 function CTA() {
   return (
-    <section style={{ padding: "100px 56px", background: T.bg }}>
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "64px 56px", background: T.navy, borderRadius: 24, color: "#fff", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -80, right: -80, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, #10b98133, transparent 70%)" }} />
-        <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 48, alignItems: "center" }}>
-          <div>
-            <h2 style={{ fontSize: 44, fontWeight: 600, letterSpacing: -1, margin: 0, lineHeight: 1.05 }}>
-              Essayez SmartPresence gratuitement<br />pendant 1 mois.
-            </h2>
-            <p style={{ fontSize: 16, color: "rgba(255,255,255,.7)", marginTop: 16, maxWidth: 460, marginBottom: 0 }}>
-              Aucune carte bancaire requise. Annulation à tout moment. Migration depuis Excel ou autre solution incluse.
-            </p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <a href="/register" style={{ padding: "16px 24px", background: T.accent, color: "#001b10", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Démarrer gratuitement</a>
-            <a href="#features" style={{ padding: "16px 24px", background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,.2)", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Planifier une démo</a>
+    <section className="lp-cta-section" style={{ background: T.bg }}>
+      <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <div className="lp-cta-inner" style={{ background: T.navy, color: "#fff" }}>
+          <div style={{ position: "absolute", top: -80, right: -80, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, #10b98133, transparent 70%)" }} />
+          <div className="lp-cta-grid">
+            <div>
+              <h2 className="lp-cta-h2" style={{ fontWeight: 600, margin: 0, lineHeight: 1.05 }}>
+                Essayez SmartPresence gratuitement<br />pendant 1 mois.
+              </h2>
+              <p style={{ fontSize: 16, color: "rgba(255,255,255,.7)", marginTop: 16, maxWidth: 460, marginBottom: 0 }}>
+                Aucune carte bancaire requise. Annulation à tout moment. Migration depuis Excel ou autre solution incluse.
+              </p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <a href="/register" style={{ padding: "16px 24px", background: T.accent, color: "#001b10", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Démarrer gratuitement</a>
+              <a href="#features" style={{ padding: "16px 24px", background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,.2)", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Planifier une démo</a>
+            </div>
           </div>
         </div>
       </div>
@@ -495,9 +523,9 @@ function Footer() {
     { t: "Légal", links: ["Mentions", "Confidentialité", "CGU", "RGPD"] },
   ];
   return (
-    <footer style={{ padding: "56px 56px 32px", background: T.bg, borderTop: `1px solid ${T.line}`, color: T.muted }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr 1fr", gap: 48 }}>
-        <div>
+    <footer className="lp-footer" style={{ background: T.bg, borderTop: `1px solid ${T.line}`, color: T.muted }}>
+      <div className="lp-footer-grid">
+        <div className="lp-footer-brand">
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <LogoMark size={24} />
             <span style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>SmartPresence</span>
@@ -515,7 +543,7 @@ function Footer() {
           </div>
         ))}
       </div>
-      <div style={{ maxWidth: 1280, margin: "40px auto 0", paddingTop: 24, borderTop: `1px solid ${T.line}`, display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+      <div className="lp-footer-bottom" style={{ borderTop: `1px solid ${T.line}` }}>
         <span>© 2026 SmartPresence · Tous droits réservés</span>
         <span>Libreville · Abidjan · Dakar</span>
       </div>
