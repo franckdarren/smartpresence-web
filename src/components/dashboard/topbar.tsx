@@ -13,6 +13,7 @@ import {
   Sun,
   Moon,
   Monitor,
+  Menu,
 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ interface TopbarProps {
   name: string;
   email: string;
   role: Role;
+  onMenuToggle: () => void;
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -130,7 +132,7 @@ function ThemeToggle() {
   );
 }
 
-export function Topbar({ name, email, role }: TopbarProps) {
+export function Topbar({ name, email, role, onMenuToggle }: TopbarProps) {
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
   const [open, setOpen] = useState(false);
@@ -157,8 +159,17 @@ export function Topbar({ name, email, role }: TopbarProps) {
   const initials = getInitials(name);
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6">
-      <div />
+    <header className="flex h-16 items-center justify-between border-b border-border bg-background px-4 md:px-6">
+      {/* Hamburger — mobile uniquement */}
+      <button
+        type="button"
+        onClick={onMenuToggle}
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:hidden"
+        aria-label="Ouvrir le menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+      <div className="hidden md:block" />
 
       <div className="flex items-center gap-2">
         {/* Cloche notifications */}
