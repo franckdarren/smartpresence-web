@@ -1,6 +1,6 @@
 import { type NextRequest } from "next/server";
-import { renderToBuffer } from "@react-pdf/renderer";
-import React from "react";
+import { renderToBuffer, type DocumentProps } from "@react-pdf/renderer";
+import React, { type ReactElement } from "react";
 import { ApiResponse } from "@/lib/api/response";
 import {
   GuardError,
@@ -49,17 +49,18 @@ export async function GET(req: NextRequest) {
     );
 
     const buffer = await renderToBuffer(
-      React.createElement(ReportDocument, { data })
+      React.createElement(ReportDocument, { data }) as unknown as ReactElement<DocumentProps>
     );
 
     const filename = `rapport-presences_${from}_${to}.pdf`;
+    const body = new Uint8Array(buffer);
 
-    return new Response(buffer, {
+    return new Response(body, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="${filename}"`,
-        "Content-Length": String(buffer.byteLength),
+        "Content-Length": String(body.byteLength),
         "Cache-Control": "no-store",
       },
     });
