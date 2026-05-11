@@ -41,19 +41,19 @@ const STEPS = [
 
 const PLANS = [
   {
-    name: "Starter", price: "25 000",
+    name: "Starter", price: "25 000", priceAnnual: "20 833",
     target: "Petites entreprises, commerces, restaurants, ONG",
     features: ["Jusqu'à 15 employés", "1 site / 1 QR Code", "Pointage GPS + Wi-Fi", "Dashboard admin basique", "Support email"],
     cta: "Commencer", popular: false,
   },
   {
-    name: "Business", price: "65 000",
+    name: "Business", price: "65 000", priceAnnual: "54 167",
     target: "PME, écoles, cliniques, agences",
     features: ["Jusqu'à 50 employés", "Jusqu'à 3 sites / 3 QR Codes", "Pointage GPS + Wi-Fi", "Dashboard complet + exports Excel", "Historique 12 mois", "Support WhatsApp"],
     cta: "Choisir Business", popular: true,
   },
   {
-    name: "Enterprise", price: "150 000",
+    name: "Enterprise", price: "150 000", priceAnnual: "125 000",
     target: "Grands groupes, banques, filiales pétrolières",
     features: ["Employés illimités", "Sites & QR Codes illimités", "API REST complète", "Rapports avancés + exports personnalisés", "Historique illimité", "Support téléphonique dédié + onboarding"],
     cta: "Parler aux ventes", popular: false,
@@ -413,6 +413,7 @@ function Security() {
 }
 
 function Pricing() {
+  const [annual, setAnnual] = useState(false);
   return (
     <section id="pricing" className="lp-section" style={{ background: T.bg }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
@@ -423,11 +424,19 @@ function Pricing() {
             1 mois gratuit pour tester. Paiement annuel : 2 mois offerts. Mobile Money (Airtel Money, Moov Money) accepté.
           </p>
           <div style={{ display: "inline-flex", marginTop: 28, padding: 4, background: T.soft, borderRadius: 10, fontSize: 13, fontWeight: 600 }}>
-            <span style={{ padding: "8px 16px", borderRadius: 8, background: T.bg, color: T.ink, boxShadow: `0 0 0 1px ${T.line}` }}>Mensuel</span>
-            <span style={{ padding: "8px 16px", color: T.muted, display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <button
+              onClick={() => setAnnual(false)}
+              style={{ padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13, background: !annual ? T.bg : "transparent", color: !annual ? T.ink : T.muted, boxShadow: !annual ? `0 0 0 1px ${T.line}` : "none", transition: "all 0.15s" }}
+            >
+              Mensuel
+            </button>
+            <button
+              onClick={() => setAnnual(true)}
+              style={{ padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 6, background: annual ? T.bg : "transparent", color: annual ? T.ink : T.muted, boxShadow: annual ? `0 0 0 1px ${T.line}` : "none", transition: "all 0.15s" }}
+            >
               Annuel
               <span style={{ fontSize: 10, padding: "2px 6px", background: "#10b98122", color: T.accentDark, borderRadius: 999 }}>−2 mois</span>
-            </span>
+            </button>
           </div>
         </div>
         <div className="lp-pricing-grid">
@@ -439,8 +448,11 @@ function Pricing() {
               <div style={{ fontSize: 15, fontWeight: 600 }}>{p.name}</div>
               <div style={{ fontSize: 13, color: p.popular ? "rgba(255,255,255,.6)" : T.muted, marginTop: 4, minHeight: 36 }}>{p.target}</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 24, paddingBottom: 24, borderBottom: p.popular ? "1px solid rgba(255,255,255,.1)" : `1px solid ${T.line}` }}>
-                <span style={{ fontSize: 38, fontWeight: 600, letterSpacing: -1 }}>{p.price}</span>
-                <span style={{ fontSize: 13, color: p.popular ? "rgba(255,255,255,.6)" : T.muted }}>FCFA / mois</span>
+                <span style={{ fontSize: 38, fontWeight: 600, letterSpacing: -1 }}>{annual ? p.priceAnnual : p.price}</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <span style={{ fontSize: 13, color: p.popular ? "rgba(255,255,255,.6)" : T.muted }}>FCFA / mois</span>
+                  {annual && <span style={{ fontSize: 11, color: p.popular ? "rgba(255,255,255,.45)" : T.muted }}>facturé annuellement</span>}
+                </div>
               </div>
               <ul style={{ listStyle: "none", padding: 0, margin: "24px 0", display: "flex", flexDirection: "column", gap: 10 }}>
                 {p.features.map((f, j) => (
