@@ -29,7 +29,7 @@ const FEATURES = [
   { icon: "gps" as const, title: "Géolocalisation 100m", desc: "Vérification du rayon GPS autour du site. Les pointages à distance sont automatiquement bloqués." },
   { icon: "wifi" as const, title: "Vérification Wi-Fi", desc: "Double contrôle facultatif via le SSID de l'entreprise. Idéal pour les bureaux et bâtiments fermés." },
   { icon: "clock" as const, title: "Heures d'arrivée & départ", desc: "Enregistrement automatique du check-in et check-out, avec coordonnées et réseau Wi-Fi associés." },
-  { icon: "shield" as const, title: "Multi-tenant sécurisé", desc: "Chaque entreprise est isolée. Row Level Security PostgreSQL et JWT Supabase pour chaque requête." },
+  { icon: "shield" as const, title: "Multi-tenant sécurisé", desc: "Chaque entreprise est isolée. Row Level Security et JWT pour chaque requête." },
   { icon: "api" as const, title: "API REST complète", desc: "Intégrez SmartPresence à votre SIRH, votre paie ou vos outils métier via une API documentée." },
 ];
 
@@ -65,7 +65,7 @@ const FAQ_ITEMS = [
   { q: "Et si l'employé n'est pas connecté au Wi-Fi de l'entreprise ?", a: "La vérification Wi-Fi est optionnelle, par site. Si vous l'activez, le SSID envoyé doit correspondre. Sinon, le pointage repose uniquement sur la géolocalisation." },
   { q: "Quels modes de paiement acceptez-vous ?", a: "Mobile Money (Airtel Money, Moov Money) en priorité. Virements bancaires et cartes acceptés sur demande. La facturation annuelle offre 2 mois gratuits." },
   { q: "Puis-je dépasser la limite d'employés de mon plan ?", a: "Oui, chaque employé supplémentaire au-delà du palier coûte 2 000 FCFA / mois. Vous pouvez aussi passer au plan supérieur à tout moment depuis votre dashboard." },
-  { q: "Mes données sont-elles en sécurité ?", a: "Hébergement PostgreSQL chiffré, isolation multi-tenant via Row Level Security, JWT pour chaque appel API. Les pointages d'une entreprise ne sont jamais visibles par une autre." },
+  { q: "Mes données sont-elles en sécurité ?", a: "Hébergement chiffré, isolation multi-tenant via Row Level Security, JWT pour chaque appel API. Les pointages d'une entreprise ne sont jamais visibles par une autre." },
   { q: "Existe-t-il une période d'essai ?", a: "Oui. Un mois gratuit pour tester l'ensemble des fonctionnalités, sans engagement et sans carte bancaire requise." },
 ];
 
@@ -545,7 +545,7 @@ function Footer() {
       </div>
       <div className="lp-footer-bottom" style={{ borderTop: `1px solid ${T.line}` }}>
         <span>© 2026 SmartPresence · Tous droits réservés</span>
-        <span>Libreville · Abidjan · Dakar</span>
+        <span>SANTEGAB</span>
       </div>
     </footer>
   );
