@@ -11,6 +11,7 @@ import {
   Building2,
   CreditCard,
   MapPin,
+  Inbox,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "@/components/brand-logo";
@@ -42,6 +43,7 @@ const superadminNavItems = [
   { label: "Entreprises", href: "/companies", icon: Building2 },
   { label: "Utilisateurs", href: "/superadmin/users", icon: Users },
   { label: "Abonnements", href: "/subscriptions", icon: CreditCard },
+  { label: "Demandes démo", href: "/superadmin/demo-requests", icon: Inbox },
 ];
 
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
