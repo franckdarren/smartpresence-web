@@ -285,12 +285,12 @@ function DemoModal({ open, onClose }: DemoModalProps) {
 
   return (
     <div
-      style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+      style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "16px", overflowY: "auto" }}
       onClick={handleClose}
     >
-      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.45)", backdropFilter: "blur(4px)" }} />
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", backdropFilter: "blur(4px)" }} />
       <div
-        style={{ position: "relative", background: T.bg, borderRadius: 16, padding: 32, width: "100%", maxWidth: 480, boxShadow: "0 24px 64px -12px rgba(0,0,0,.3)", border: `1px solid ${T.line}` }}
+        style={{ position: "relative", background: T.bg, borderRadius: 16, padding: 32, width: "100%", maxWidth: 480, boxShadow: "0 24px 64px -12px rgba(0,0,0,.3)", border: `1px solid ${T.line}`, margin: "auto", flexShrink: 0 }}
         onClick={e => e.stopPropagation()}
       >
         <button
