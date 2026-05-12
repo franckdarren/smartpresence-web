@@ -128,6 +128,18 @@ export const paymentRequests = pgTable("payment_requests", {
   created_at: timestamp("created_at").defaultNow(),
 });
 
+// ─── DEMO REQUESTS ───────────────────────────────────────────
+export const demoRequests = pgTable("demo_requests", {
+  id:             uuid("id").primaryKey().defaultRandom(),
+  name:           text("name").notNull(),
+  company_name:   text("company_name").notNull(),
+  email:          text("email").notNull(),
+  phone:          text("phone"),
+  employee_count: text("employee_count").notNull(),
+  status:         text("status", { enum: ["new", "contacted", "converted"] }).notNull().default("new"),
+  created_at:     timestamp("created_at").defaultNow(),
+});
+
 // Types inférés
 export type Company    = typeof companies.$inferSelect;
 export type NewCompany = typeof companies.$inferInsert;
@@ -145,3 +157,5 @@ export type NotificationLog    = typeof notificationLogs.$inferSelect;
 export type NewNotificationLog = typeof notificationLogs.$inferInsert;
 export type PaymentRequest    = typeof paymentRequests.$inferSelect;
 export type NewPaymentRequest = typeof paymentRequests.$inferInsert;
+export type DemoRequest       = typeof demoRequests.$inferSelect;
+export type NewDemoRequest    = typeof demoRequests.$inferInsert;

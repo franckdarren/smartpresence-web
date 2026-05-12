@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, FormEvent } from "react";
 
 // ── Design tokens (CSS variables — switch via .dark class) ─────────────────
 const T = {
@@ -231,6 +231,155 @@ function DashboardMock() {
   );
 }
 
+// ── Demo modal ─────────────────────────────────────────────────────────────
+type DemoModalProps = { open: boolean; onClose: () => void };
+
+function DemoModal({ open, onClose }: DemoModalProps) {
+  const [form, setForm] = useState({ name: "", company_name: "", email: "", phone: "", employee_count: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  if (!open) return null;
+
+  function set(field: string, value: string) {
+    setForm(f => ({ ...f, [field]: value }));
+    setError(null);
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/v1/demo-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        setError(json.message ?? "Une erreur est survenue");
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setError("Impossible de contacter le serveur. Réessayez.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleClose() {
+    setSuccess(false);
+    setError(null);
+    setForm({ name: "", company_name: "", email: "", phone: "", employee_count: "" });
+    onClose();
+  }
+
+  const inputStyle: CSSProperties = {
+    width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${T.line}`,
+    fontSize: 14, color: T.ink, background: T.bg, outline: "none", boxSizing: "border-box",
+  };
+  const labelStyle: CSSProperties = { fontSize: 13, fontWeight: 500, color: T.ink, marginBottom: 6, display: "block" };
+
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+      onClick={handleClose}
+    >
+      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.45)", backdropFilter: "blur(4px)" }} />
+      <div
+        style={{ position: "relative", background: T.bg, borderRadius: 16, padding: 32, width: "100%", maxWidth: 480, boxShadow: "0 24px 64px -12px rgba(0,0,0,.3)", border: `1px solid ${T.line}` }}
+        onClick={e => e.stopPropagation()}
+      >
+        <button
+          onClick={handleClose}
+          aria-label="Fermer"
+          style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", color: T.muted, padding: 4 }}
+        >
+          <Icon name="x" size={20} stroke={T.muted} />
+        </button>
+
+        {success ? (
+          <div style={{ textAlign: "center", padding: "24px 0" }}>
+            <div style={{ width: 56, height: 56, borderRadius: 28, background: "#10b98122", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+              <Icon name="check" size={28} stroke={T.accentDark} strokeWidth={2.5} />
+            </div>
+            <h3 style={{ fontSize: 20, fontWeight: 600, color: T.ink, margin: "0 0 10px" }}>Demande envoyée !</h3>
+            <p style={{ fontSize: 14, color: T.muted, lineHeight: 1.6, margin: "0 0 24px" }}>
+              Nous reviendrons vers vous sous 24h pour planifier votre démo personnalisée.
+            </p>
+            <button
+              onClick={handleClose}
+              style={{ padding: "12px 24px", background: T.navy, color: "#fff", borderRadius: 10, fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer" }}
+            >
+              Fermer
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{ marginBottom: 24 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 600, color: T.ink, margin: "0 0 8px" }}>Demander une démo</h3>
+              <p style={{ fontSize: 13, color: T.muted, margin: 0, lineHeight: 1.5 }}>
+                Un de nos experts vous contactera sous 24h pour une présentation personnalisée.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <label style={labelStyle}>Nom complet *</label>
+                <input style={inputStyle} type="text" placeholder="Jean Mbeki" value={form.name} onChange={e => set("name", e.target.value)} required />
+              </div>
+              <div>
+                <label style={labelStyle}>Entreprise *</label>
+                <input style={inputStyle} type="text" placeholder="ACME Gabon SA" value={form.company_name} onChange={e => set("company_name", e.target.value)} required />
+              </div>
+              <div>
+                <label style={labelStyle}>Email professionnel *</label>
+                <input style={inputStyle} type="email" placeholder="jean@acme.ga" value={form.email} onChange={e => set("email", e.target.value)} required />
+              </div>
+              <div>
+                <label style={labelStyle}>Téléphone / WhatsApp</label>
+                <input style={inputStyle} type="tel" placeholder="+241 06 00 00 00" value={form.phone} onChange={e => set("phone", e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>Nombre d'employés *</label>
+                <select
+                  style={{ ...inputStyle, appearance: "none", cursor: "pointer" }}
+                  value={form.employee_count}
+                  onChange={e => set("employee_count", e.target.value)}
+                  required
+                >
+                  <option value="" disabled>Sélectionner...</option>
+                  <option value="<15">Moins de 15 employés</option>
+                  <option value="15-50">15 à 50 employés</option>
+                  <option value="50-200">50 à 200 employés</option>
+                  <option value="200+">Plus de 200 employés</option>
+                </select>
+              </div>
+
+              {error && (
+                <div style={{ padding: "10px 14px", background: "#fee2e2", border: "1px solid #fca5a5", borderRadius: 8, fontSize: 13, color: "#b91c1c" }}>
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                style={{ padding: "13px 24px", background: T.navy, color: "#fff", borderRadius: 10, fontWeight: 600, fontSize: 15, border: "none", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, marginTop: 4 }}
+              >
+                {loading ? "Envoi en cours…" : "Envoyer ma demande"}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Sections ───────────────────────────────────────────────────────────────
 function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -275,7 +424,7 @@ function Nav() {
   );
 }
 
-function Hero() {
+function Hero({ onDemoClick }: { onDemoClick: () => void }) {
   return (
     <section className="lp-hero-section" style={{ background: T.bg }}>
       <div className="lp-hero-grid">
@@ -296,9 +445,9 @@ function Hero() {
               Démarrer 1 mois gratuit
               <Icon name="arrow" size={16} stroke="#fff" strokeWidth={2} />
             </a>
-            <a href="#features" style={{ display: "inline-flex", alignItems: "center", padding: "14px 22px", color: T.ink, borderRadius: 10, fontWeight: 600, fontSize: 15, textDecoration: "none", border: `1px solid ${T.line}` }}>
+            <button onClick={onDemoClick} style={{ display: "inline-flex", alignItems: "center", padding: "14px 22px", color: T.ink, borderRadius: 10, fontWeight: 600, fontSize: 15, textDecoration: "none", border: `1px solid ${T.line}`, background: "none", cursor: "pointer" }}>
               Voir une démo
-            </a>
+            </button>
           </div>
           <div className="lp-hero-stats" style={{ borderTop: `1px solid ${T.line}` }}>
             {[{ v: "< 1s", l: "Validation de pointage" }, { v: "100m", l: "Rayon GPS par site" }, { v: "API", l: "REST documentée" }].map((s, i) => (
@@ -501,7 +650,7 @@ function FAQ() {
   );
 }
 
-function CTA() {
+function CTA({ onDemoClick }: { onDemoClick: () => void }) {
   return (
     <section className="lp-cta-section" style={{ background: T.bg }}>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
@@ -518,7 +667,7 @@ function CTA() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <a href="/register" style={{ padding: "16px 24px", background: T.accent, color: "#001b10", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Démarrer gratuitement</a>
-              <a href="#features" style={{ padding: "16px 24px", background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,.2)", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", textDecoration: "none" }}>Planifier une démo</a>
+              <button onClick={onDemoClick} style={{ padding: "16px 24px", background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,.2)", borderRadius: 10, fontWeight: 600, fontSize: 15, textAlign: "center", cursor: "pointer" }}>Planifier une démo</button>
             </div>
           </div>
         </div>
@@ -565,16 +714,18 @@ function Footer() {
 
 // ── Main component ─────────────────────────────────────────────────────────
 export function LandingPage() {
+  const [demoOpen, setDemoOpen] = useState(false);
   return (
     <div style={{ background: T.bg, color: T.ink, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", width: "100%", fontFeatureSettings: '"ss01", "cv11"' }}>
+      <DemoModal open={demoOpen} onClose={() => setDemoOpen(false)} />
       <Nav />
-      <Hero />
+      <Hero onDemoClick={() => setDemoOpen(true)} />
       <Steps />
       <Features />
       <Security />
       <Pricing />
       <FAQ />
-      <CTA />
+      <CTA onDemoClick={() => setDemoOpen(true)} />
       <Footer />
     </div>
   );
