@@ -38,4 +38,15 @@ export class EmployeesService {
     await this.getByIdInCompany(id, companyId);
     return repo.softDelete(id);
   }
+
+  async listDeleted(companyId: string): Promise<User[]> {
+    return repo.findDeletedByCompanyId(companyId);
+  }
+
+  async restore(id: string, companyId: string): Promise<void> {
+    const deleted = await repo.findDeletedByCompanyId(companyId);
+    const found = deleted.find((u) => u.id === id);
+    if (!found) throw new Error("Employé archivé introuvable");
+    return repo.restore(id);
+  }
 }

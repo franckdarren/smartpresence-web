@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import type { User, NewUser } from "@/lib/db/schema";
-import { eq, and, count, isNull } from "drizzle-orm";
+import { eq, and, count, isNull, isNotNull } from "drizzle-orm";
 
 export class EmployeesRepository {
   async findById(id: string): Promise<User | undefined> {
@@ -57,6 +57,20 @@ export class EmployeesRepository {
       .update(users)
       .set({ deleted_at: new Date() })
       .where(eq(users.id, id));
+  }
+
+  async restore(id: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ deleted_at: null })
+      .where(eq(users.id, id));
+  }
+
+  async findDeletedByCompanyId(companyId: string): Promise<User[]> {
+    return db
+      .select()
+      .from(users)
+      .where(and(eq(users.company_id, companyId), isNotNull(users.deleted_at)));
   }
 
   async countByCompanyId(companyId: string): Promise<number> {

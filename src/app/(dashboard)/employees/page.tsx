@@ -17,9 +17,12 @@ export default async function EmployeesPage() {
     .eq("id", user!.id)
     .single();
 
-  const employees = profile?.company_id
-    ? await service.listByCompany(profile.company_id)
-    : [];
+  const [employees, deletedEmployees] = profile?.company_id
+    ? await Promise.all([
+        service.listByCompany(profile.company_id),
+        service.listDeleted(profile.company_id),
+      ])
+    : [[], []];
 
   return (
     <div className="space-y-6">
@@ -35,7 +38,7 @@ export default async function EmployeesPage() {
         <AddEmployeeModal />
       </div>
 
-      <EmployeeTable employees={employees} />
+      <EmployeeTable employees={employees} deletedEmployees={deletedEmployees} />
     </div>
   );
 }
