@@ -11,26 +11,14 @@ jobs:
     name: Ping Supabase DB
     runs-on: ubuntu-latest
     steps:
-      - name: Ping REST API Supabase
+      - name: Ping base de données Supabase
         env:
-          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "Secrets NEXT_PUBLIC_SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY non configurés."
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Secret DATABASE_URL non configuré."
             exit 1
           fi
 
-          STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" \
-            "${SUPABASE_URL}/rest/v1/companies?select=id&limit=1" \
-            -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}")
-
-          echo "Supabase ping → HTTP $STATUS"
-
-          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 300 ]; then
-            echo "Ping failed avec le statut $STATUS"
-            exit 1
-          fi
-
+          psql "$DATABASE_URL" -c "SELECT 1;" --no-password
           echo "Base de données active."
