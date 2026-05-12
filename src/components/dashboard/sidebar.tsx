@@ -32,6 +32,11 @@ const adminNavItems = [
   { label: "Mon abonnement", href: "/my-subscription", icon: CreditCard },
 ];
 
+const employeeNavItems = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Présences", href: "/attendance", icon: CalendarCheck },
+];
+
 const superadminNavItems = [
   { label: "Vue globale", href: "/superadmin/overview", icon: Globe },
   { label: "Entreprises", href: "/companies", icon: Building2 },
@@ -41,7 +46,12 @@ const superadminNavItems = [
 
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const navItems = role === "superadmin" ? superadminNavItems : adminNavItems;
+  const navItems =
+    role === "superadmin"
+      ? superadminNavItems
+      : role === "employee"
+        ? employeeNavItems
+        : adminNavItems;
 
   return (
     <>
