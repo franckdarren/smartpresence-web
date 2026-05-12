@@ -12,11 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping REST API Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Secrets NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY non configurés."
+            exit 1
+          fi
+
           STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" \
-            "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/companies?select=id&limit=1" \
-            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}")
+            "${SUPABASE_URL}/rest/v1/companies?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
 
           echo "Supabase ping → HTTP $STATUS"
 
