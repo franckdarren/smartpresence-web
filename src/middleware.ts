@@ -71,7 +71,9 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/my-subscription");
 
   const isProtectedApi =
-    pathname.startsWith("/api/v1") && !pathname.startsWith("/api/v1/auth");
+    pathname.startsWith("/api/v1") &&
+    !pathname.startsWith("/api/v1/auth") &&
+    !pathname.startsWith("/api/v1/demo-request");
 
   // 401 — non authentifié
   if ((isProtectedDashboard || isProtectedApi) && !user) {
