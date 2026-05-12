@@ -6,7 +6,7 @@ export const createDemoRequestSchema = z.object({
   email:          z.string().email("Adresse email invalide"),
   phone:          z.string().max(20).optional(),
   employee_count: z.enum(["<15", "15-50", "50-200", "200+"], {
-    errorMap: () => ({ message: "Sélectionnez une taille d'équipe" }),
+    error: "Sélectionnez une taille d'équipe",
   }),
 });
 
